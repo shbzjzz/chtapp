@@ -2,555 +2,573 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>ChatApp</title>
 <style>
-/* ── Reset & Variables ─────────────────────────────── */
+/* ── Reset ──────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0f0f13;
-  --bg2: #1a1a24;
-  --bg3: #242433;
-  --bg4: #2e2e42;
-  --accent: #7c6af7;
+  --bg:      #0c0c10;
+  --bg2:     #14141c;
+  --bg3:     #1e1e2a;
+  --bg4:     #28283a;
+  --accent:  #7c6af7;
   --accent2: #5f4fd1;
-  --green: #22c55e;
-  --red: #ef4444;
-  --yellow: #eab308;
-  --text: #e8e8f0;
-  --text2: #9898b0;
-  --text3: #5a5a72;
-  --border: #2e2e42;
-  --radius: 12px;
-  --shadow: 0 8px 32px rgba(0,0,0,0.4);
-  --font: 'Inter', system-ui, sans-serif;
+  --green:   #22c55e;
+  --red:     #ef4444;
+  --text:    #eaeaf4;
+  --text2:   #9898b8;
+  --text3:   #55556e;
+  --border:  rgba(255,255,255,.07);
+  --shadow:  0 12px 40px rgba(0,0,0,.5);
+  --r:       12px;
+  --sidebar-w: 320px;
+  --header-h:  60px;
+  --input-h:   68px;
+  --safe-b:    env(safe-area-inset-bottom, 0px);
 }
 
-body {
-  font-family: var(--font);
+html, body {
+  height: 100%; height: 100dvh;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   background: var(--bg);
   color: var(--text);
-  height: 100dvh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── Auth Screen ───────────────────────────────────── */
+/* ══ AUTH ═══════════════════════════════════════ */
 #auth-screen {
-  position: fixed; inset: 0;
+  position: fixed; inset: 0; z-index: 200;
   display: flex; align-items: center; justify-content: center;
   background: var(--bg);
-  z-index: 100;
+  padding: 16px;
 }
 #auth-screen.hidden { display: none; }
 
 .auth-card {
+  width: 100%; max-width: 400px;
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 40px;
-  width: 100%;
-  max-width: 420px;
+  padding: 36px 32px;
   box-shadow: var(--shadow);
 }
-
-.auth-logo {
-  text-align: center;
-  margin-bottom: 32px;
+@media (max-width: 480px) {
+  .auth-card { padding: 28px 20px; border-radius: 16px; }
 }
-.auth-logo .logo-icon {
-  width: 60px; height: 60px;
+
+.auth-logo { text-align: center; margin-bottom: 28px; }
+.logo-icon {
+  width: 56px; height: 56px;
   background: linear-gradient(135deg, var(--accent), #a78bfa);
   border-radius: 16px;
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: 28px;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 20px rgba(124, 106, 247, 0.4);
+  font-size: 26px; margin-bottom: 12px;
+  box-shadow: 0 4px 20px rgba(124,106,247,.4);
 }
-.auth-logo h1 { font-size: 24px; font-weight: 700; }
-.auth-logo p { color: var(--text2); font-size: 14px; margin-top: 4px; }
+.auth-logo h1 { font-size: 22px; font-weight: 700; }
+.auth-logo p  { font-size: 14px; color: var(--text2); margin-top: 4px; }
 
 .auth-tabs {
-  display: flex;
-  background: var(--bg3);
-  border-radius: 10px;
-  padding: 4px;
-  margin-bottom: 24px;
-  gap: 4px;
+  display: flex; background: var(--bg3);
+  border-radius: 10px; padding: 3px; margin-bottom: 22px; gap: 3px;
 }
 .auth-tab {
-  flex: 1; padding: 8px;
-  background: none; border: none;
-  color: var(--text2); font-size: 14px; font-weight: 500;
-  border-radius: 8px; cursor: pointer;
-  transition: all .2s;
+  flex: 1; padding: 9px; background: none; border: none;
+  color: var(--text2); font-size: 14px; font-weight: 600;
+  border-radius: 8px; cursor: pointer; transition: all .2s;
 }
-.auth-tab.active {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(124,106,247,.4);
-}
+.auth-tab.active { background: var(--accent); color: #fff; }
 
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12px; color: var(--text2); font-weight: 600; margin-bottom: 6px; letter-spacing: .03em; }
 .form-group input {
-  width: 100%; padding: 12px 14px;
+  width: 100%; padding: 13px 14px;
   background: var(--bg3); border: 1px solid var(--border);
-  border-radius: 10px; color: var(--text); font-size: 15px;
-  transition: border-color .2s;
-  outline: none;
+  border-radius: 10px; color: var(--text); font-size: 15px; outline: none;
+  transition: border-color .2s; -webkit-appearance: none;
 }
 .form-group input:focus { border-color: var(--accent); }
 .form-group input::placeholder { color: var(--text3); }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 20px; border: none; border-radius: 10px;
+  padding: 13px 20px; border: none; border-radius: 10px;
   font-size: 15px; font-weight: 600; cursor: pointer;
-  transition: all .2s; text-decoration: none;
+  transition: all .18s; -webkit-tap-highlight-color: transparent;
 }
-.btn-primary {
-  background: var(--accent); color: #fff; width: 100%;
-  box-shadow: 0 4px 16px rgba(124,106,247,.4);
-}
-.btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
-.btn-primary:active { transform: translateY(0); }
+.btn-primary { background: var(--accent); color: #fff; width: 100%; margin-top: 4px; }
+.btn-primary:active { transform: scale(.98); }
 .btn-icon {
   background: var(--bg3); color: var(--text2); border: 1px solid var(--border);
-  border-radius: 10px; width: 40px; height: 40px; padding: 0;
-  flex-shrink: 0;
+  width: 40px; height: 40px; padding: 0; border-radius: 10px; flex-shrink: 0;
 }
-.btn-icon:hover { background: var(--bg4); color: var(--text); }
+.btn-icon:active { background: var(--bg4); }
 
-.auth-error {
-  background: rgba(239,68,68,.15);
-  border: 1px solid rgba(239,68,68,.3);
+.auth-err {
+  background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.3);
   color: #f87171; border-radius: 8px; padding: 10px 14px;
-  font-size: 13px; margin-bottom: 16px; display: none;
+  font-size: 13px; margin-bottom: 14px; display: none;
 }
-.auth-error.show { display: block; }
+.auth-err.show { display: block; }
 
-/* ── App Layout ────────────────────────────────────── */
-#app { display: flex; height: 100dvh; overflow: hidden; }
+/* ══ APP SHELL ══════════════════════════════════ */
+#app { display: flex; height: 100dvh; overflow: hidden; position: relative; }
 #app.hidden { display: none; }
 
-/* Sidebar */
+/* ── Sidebar ─────────────────────────────────── */
 .sidebar {
-  width: 320px; flex-shrink: 0;
+  width: var(--sidebar-w);
   background: var(--bg2);
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column;
-  transition: transform .3s;
+  flex-shrink: 0;
+  z-index: 30;
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+}
+
+/* Mobile: sidebar slides over chat */
+@media (max-width: 700px) {
+  .sidebar {
+    position: absolute; top: 0; left: 0; bottom: 0;
+    transform: translateX(-100%);
+    box-shadow: var(--shadow);
+  }
+  .sidebar.open { transform: translateX(0); }
+}
+
+.sidebar-backdrop {
+  display: none; position: absolute; inset: 0; z-index: 29;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(2px);
+}
+@media (max-width: 700px) {
+  .sidebar-backdrop.show { display: block; }
 }
 
 .sidebar-header {
-  padding: 20px 16px 12px;
   display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 14px 12px;
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.sidebar-header h2 { font-size: 20px; font-weight: 700; }
-.sidebar-actions { display: flex; gap: 8px; }
+.sidebar-header h2 { font-size: 19px; font-weight: 700; }
+.sidebar-actions { display: flex; gap: 6px; }
 
-.search-box {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
+.search-wrap {
+  padding: 10px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0;
 }
-.search-input-wrap {
-  display: flex; align-items: center; gap: 10px;
+.search-inner {
+  display: flex; align-items: center; gap: 8px;
   background: var(--bg3); border: 1px solid var(--border);
   border-radius: 10px; padding: 0 12px;
 }
-.search-input-wrap svg { color: var(--text3); flex-shrink: 0; }
-.search-input-wrap input {
+.search-inner svg { color: var(--text3); flex-shrink: 0; }
+.search-inner input {
   flex: 1; background: none; border: none; outline: none;
   color: var(--text); font-size: 14px; padding: 10px 0;
 }
-.search-input-wrap input::placeholder { color: var(--text3); }
+.search-inner input::placeholder { color: var(--text3); }
 
-.conv-list { flex: 1; overflow-y: auto; }
-.conv-list::-webkit-scrollbar { width: 4px; }
-.conv-list::-webkit-scrollbar-track { background: transparent; }
-.conv-list::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+.conv-list { flex: 1; overflow-y: auto; overscroll-behavior: contain; }
+.conv-list::-webkit-scrollbar { width: 3px; }
+.conv-list::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
 
 .conv-item {
   display: flex; align-items: center; gap: 12px;
-  padding: 12px 16px; cursor: pointer;
-  transition: background .15s; border-left: 3px solid transparent;
-  position: relative;
+  padding: 13px 14px; cursor: pointer;
+  transition: background .12s; border-left: 3px solid transparent;
+  -webkit-tap-highlight-color: transparent;
 }
-.conv-item:hover { background: var(--bg3); }
-.conv-item.active {
-  background: var(--bg3);
-  border-left-color: var(--accent);
-}
+.conv-item:hover, .conv-item.active { background: var(--bg3); }
+.conv-item.active { border-left-color: var(--accent); }
 
-.avatar {
-  position: relative; flex-shrink: 0;
-}
-.avatar-img {
+.avatar { position: relative; flex-shrink: 0; }
+.av-img {
   width: 46px; height: 46px; border-radius: 50%;
   background: linear-gradient(135deg, var(--accent), #a78bfa);
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px; font-weight: 700; color: #fff;
-  overflow: hidden;
+  font-size: 17px; font-weight: 700; color: #fff; overflow: hidden;
 }
-.avatar-img img { width: 100%; height: 100%; object-fit: cover; }
-.status-dot {
+.av-img img { width: 100%; height: 100%; object-fit: cover; }
+.av-dot {
   position: absolute; bottom: 1px; right: 1px;
   width: 12px; height: 12px; border-radius: 50%;
-  border: 2px solid var(--bg2);
-  background: var(--text3);
+  border: 2px solid var(--bg2); background: var(--text3);
 }
-.status-dot.online { background: var(--green); }
+.av-dot.online { background: var(--green); }
 
 .conv-info { flex: 1; min-width: 0; }
-.conv-name { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
-.conv-preview {
-  font-size: 13px; color: var(--text2);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-.conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.conv-name { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.conv-prev { font-size: 13px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
 .conv-time { font-size: 11px; color: var(--text3); }
-.unread-badge {
+.badge {
   background: var(--accent); color: #fff;
   border-radius: 10px; font-size: 11px; font-weight: 700;
   padding: 2px 6px; min-width: 18px; text-align: center;
 }
 
 .sidebar-footer {
-  padding: 12px 16px;
+  padding: 12px 14px;
   border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 12px;
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  padding-bottom: calc(12px + var(--safe-b));
 }
-.me-info { flex: 1; min-width: 0; }
 .me-name { font-size: 14px; font-weight: 600; }
 .me-status { font-size: 12px; color: var(--green); }
 
-/* ── Main Chat Area ─────────────────────────────────── */
+/* ── Chat Area ───────────────────────────────── */
 .chat-area {
-  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  flex: 1; display: flex; flex-direction: column;
+  overflow: hidden; min-width: 0;
   background: var(--bg);
+}
+
+/* Mobile: when a convo is open, hide sidebar and show full chat */
+@media (max-width: 700px) {
+  .chat-area { width: 100%; }
 }
 
 .chat-empty {
   flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 16px;
-  color: var(--text2);
+  align-items: center; justify-content: center;
+  gap: 14px; padding: 24px; text-align: center;
 }
-.chat-empty .icon { font-size: 64px; opacity: .3; }
-.chat-empty h3 { font-size: 20px; font-weight: 600; color: var(--text2); }
-.chat-empty p { font-size: 14px; color: var(--text3); }
+.chat-empty .ei { font-size: 56px; opacity: .25; }
+.chat-empty h3 { font-size: 18px; font-weight: 600; color: var(--text2); }
+.chat-empty p  { font-size: 14px; color: var(--text3); }
 
 .chat-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 20px;
+  padding: 0 14px;
+  height: var(--header-h);
   background: var(--bg2); border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-.chat-header-left { display: flex; align-items: center; gap: 12px; }
-.chat-header-info { }
-.chat-peer-name { font-size: 16px; font-weight: 700; }
-.chat-peer-status { font-size: 13px; color: var(--text2); margin-top: 1px; }
-.chat-header-actions { display: flex; gap: 8px; }
+.chat-header-left { display: flex; align-items: center; gap: 10px; }
+
+/* back button — always visible in chat header on mobile */
+.back-btn {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 8px;
+  background: none; border: none; color: var(--text2);
+  cursor: pointer; flex-shrink: 0; -webkit-tap-highlight-color: transparent;
+}
+@media (max-width: 700px) { .back-btn { display: flex; } }
+
+.peer-name  { font-size: 15px; font-weight: 700; }
+.peer-status{ font-size: 12px; color: var(--text2); margin-top: 1px; }
+.chat-actions { display: flex; gap: 6px; }
 
 .call-btn {
   display: flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px; border-radius: 10px;
+  width: 38px; height: 38px; border-radius: 10px;
   background: var(--bg3); border: 1px solid var(--border);
-  color: var(--text2); cursor: pointer; transition: all .2s;
+  color: var(--text2); cursor: pointer; transition: all .18s;
+  -webkit-tap-highlight-color: transparent;
 }
-.call-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-.call-btn.video:hover { background: #0ea5e9; border-color: #0ea5e9; }
+.call-btn:hover, .call-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-.messages-container {
-  flex: 1; overflow-y: auto; padding: 20px;
-  display: flex; flex-direction: column; gap: 4px;
+/* msgs */
+.msgs {
+  flex: 1; overflow-y: auto; overscroll-behavior: contain;
+  padding: 16px 14px; display: flex; flex-direction: column; gap: 2px;
 }
-.messages-container::-webkit-scrollbar { width: 4px; }
-.messages-container::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+.msgs::-webkit-scrollbar { width: 3px; }
+.msgs::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
 
-.msg-group { display: flex; flex-direction: column; margin-bottom: 8px; }
-.msg-group.mine { align-items: flex-end; }
+.msg-group { display: flex; flex-direction: column; margin-bottom: 6px; }
+.msg-group.mine   { align-items: flex-end; }
 .msg-group.theirs { align-items: flex-start; }
+.msg-sender { font-size: 12px; color: var(--text3); margin-bottom: 4px; padding: 0 10px; }
 
-.msg-sender-name { font-size: 12px; color: var(--text3); margin-bottom: 4px; padding: 0 12px; }
-
-.msg-bubble {
-  max-width: 70%; padding: 10px 14px;
-  border-radius: 18px; font-size: 15px; line-height: 1.5;
-  word-break: break-word;
+.bubble {
+  max-width: min(72%, 420px);
+  padding: 10px 14px; border-radius: 18px;
+  font-size: 15px; line-height: 1.5; word-break: break-word;
 }
-.mine .msg-bubble {
-  background: var(--accent);
-  color: #fff;
-  border-bottom-right-radius: 4px;
-}
-.theirs .msg-bubble {
-  background: var(--bg3);
-  color: var(--text);
-  border-bottom-left-radius: 4px;
-}
+.mine   .bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 5px; }
+.theirs .bubble { background: var(--bg3); color: var(--text); border-bottom-left-radius: 5px; }
+.bubble.sending { opacity: .55; }
 
 .msg-meta {
-  display: flex; align-items: center; gap: 6px;
-  padding: 2px 12px;
-  font-size: 11px; color: var(--text3);
+  display: flex; align-items: center; gap: 5px;
+  padding: 2px 10px; font-size: 11px; color: var(--text3);
 }
 .mine .msg-meta { flex-direction: row-reverse; }
-.msg-read { color: var(--accent); }
-.msg-sending { opacity: .5; }
+.read-tick { color: #a78bfa; }
 
-.typing-indicator {
-  display: flex; align-items: center; gap: 12px;
-  padding: 6px 0;
-  font-size: 13px; color: var(--text3);
+.date-sep {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; color: var(--text3); margin: 10px 0;
+}
+.date-sep::before, .date-sep::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.typing-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 0; font-size: 13px; color: var(--text3);
 }
 .typing-dots { display: flex; gap: 4px; }
-.typing-dot {
+.tdot {
   width: 6px; height: 6px; background: var(--text3);
-  border-radius: 50%; animation: bounce 1s infinite;
+  border-radius: 50%; animation: tdot 1s infinite;
 }
-.typing-dot:nth-child(2) { animation-delay: .2s; }
-.typing-dot:nth-child(3) { animation-delay: .4s; }
-@keyframes bounce {
-  0%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-6px); }
+.tdot:nth-child(2) { animation-delay: .2s; }
+.tdot:nth-child(3) { animation-delay: .4s; }
+@keyframes tdot {
+  0%,80%,100% { transform: translateY(0); }
+  40%         { transform: translateY(-7px); }
 }
 
-.chat-input-area {
-  padding: 16px 20px;
+.load-more { text-align: center; padding: 12px; }
+.load-more button {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text2); border-radius: 20px; padding: 6px 16px;
+  font-size: 13px; cursor: pointer;
+}
+
+/* input */
+.chat-input-bar {
+  padding: 10px 14px;
+  padding-bottom: calc(10px + var(--safe-b));
   background: var(--bg2); border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
-.chat-input-row {
-  display: flex; align-items: flex-end; gap: 10px;
+.input-row {
+  display: flex; align-items: flex-end; gap: 8px;
   background: var(--bg3); border: 1px solid var(--border);
-  border-radius: 14px; padding: 8px 8px 8px 16px;
+  border-radius: 14px; padding: 8px 8px 8px 14px;
   transition: border-color .2s;
 }
-.chat-input-row:focus-within { border-color: var(--accent); }
-.chat-input {
+.input-row:focus-within { border-color: var(--accent); }
+.chat-ta {
   flex: 1; background: none; border: none; outline: none;
-  color: var(--text); font-size: 15px; line-height: 1.5;
-  resize: none; max-height: 120px; min-height: 24px;
-  font-family: var(--font);
+  color: var(--text); font-size: 15px; line-height: 1.45;
+  resize: none; max-height: 112px; min-height: 24px; font-family: inherit;
 }
-.chat-input::placeholder { color: var(--text3); }
+.chat-ta::placeholder { color: var(--text3); }
 .send-btn {
   width: 36px; height: 36px; border-radius: 10px;
-  background: var(--accent); border: none;
-  color: #fff; cursor: pointer; display: flex;
-  align-items: center; justify-content: center;
-  transition: all .2s; flex-shrink: 0;
+  background: var(--accent); border: none; color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background .15s; -webkit-tap-highlight-color: transparent;
 }
-.send-btn:hover { background: var(--accent2); }
-.send-btn:disabled { opacity: .4; cursor: not-allowed; }
+.send-btn:active { background: var(--accent2); }
+.send-btn:disabled { opacity: .35; cursor: not-allowed; }
 
-/* ── Search Users Modal ─────────────────────────────── */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
-  z-index: 200; display: flex; align-items: center; justify-content: center;
+/* ══ MODALS ═════════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,.65); backdrop-filter: blur(4px);
+  display: flex; align-items: flex-end; justify-content: center;
   opacity: 0; pointer-events: none; transition: opacity .2s;
+  padding: 0;
 }
-.modal-overlay.show { opacity: 1; pointer-events: all; }
+.overlay.show { opacity: 1; pointer-events: all; }
+
+@media (min-width: 480px) {
+  .overlay { align-items: center; padding: 20px; }
+}
 
 .modal {
   background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 20px; width: 100%; max-width: 440px;
-  box-shadow: var(--shadow); transform: scale(.95);
-  transition: transform .2s;
+  width: 100%; max-width: 440px;
+  border-radius: 20px 20px 0 0;
+  box-shadow: var(--shadow);
+  transform: translateY(40px); transition: transform .25s;
+  max-height: 85dvh; display: flex; flex-direction: column;
 }
-.modal-overlay.show .modal { transform: scale(1); }
+@media (min-width: 480px) {
+  .modal { border-radius: 20px; transform: scale(.96) translateY(0); }
+}
+.overlay.show .modal { transform: translateY(0); }
+@media (min-width: 480px) {
+  .overlay.show .modal { transform: scale(1); }
+}
 
-.modal-header {
-  padding: 20px 20px 16px;
+.modal-head {
   display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border);
+  padding: 18px 18px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0;
 }
-.modal-header h3 { font-size: 18px; font-weight: 700; }
+.modal-head h3 { font-size: 17px; font-weight: 700; }
 .modal-close {
   width: 32px; height: 32px; border-radius: 8px;
   background: var(--bg3); border: none; color: var(--text2);
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-size: 18px; transition: all .2s;
+  cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;
 }
-.modal-close:hover { background: var(--bg4); color: var(--text); }
-
-.modal-body { padding: 16px; }
+.modal-body { padding: 14px; overflow-y: auto; }
 
 .user-result {
   display: flex; align-items: center; gap: 12px;
   padding: 12px; border-radius: 10px; cursor: pointer;
-  transition: background .15s;
+  transition: background .12s; -webkit-tap-highlight-color: transparent;
 }
-.user-result:hover { background: var(--bg3); }
-.user-result-info { flex: 1; }
-.user-result-name { font-size: 15px; font-weight: 600; }
-.user-result-email { font-size: 13px; color: var(--text2); }
-.user-result-status { font-size: 13px; }
-.user-result-status.online { color: var(--green); }
-.user-result-status.offline { color: var(--text3); }
+.user-result:hover, .user-result:active { background: var(--bg3); }
+.ur-info { flex: 1; }
+.ur-name  { font-size: 14px; font-weight: 600; }
+.ur-email { font-size: 13px; color: var(--text2); }
+.ur-badge { font-size: 12px; }
+.ur-badge.on  { color: var(--green); }
+.ur-badge.off { color: var(--text3); }
+.no-res { text-align: center; color: var(--text3); font-size: 14px; padding: 20px; }
 
-.search-results { margin-top: 12px; min-height: 60px; }
-.search-no-results { text-align: center; color: var(--text3); font-size: 14px; padding: 20px; }
-
-/* ── Call Overlay ───────────────────────────────────── */
-.call-overlay {
-  position: fixed; inset: 0; z-index: 300;
-  background: #080810;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 24px;
-  display: none;
+/* ══ CALL OVERLAY ════════════════════════════════ */
+#call-screen {
+  position: fixed; inset: 0; z-index: 150;
+  background: #060608;
+  display: none; flex-direction: column;
 }
-.call-overlay.show { display: flex; }
+#call-screen.show { display: flex; }
 
-.video-grid {
+.video-bg {
   position: absolute; inset: 0;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2px;
-}
-.video-grid.has-remote { grid-template-columns: 1fr; }
-
-.video-container {
-  position: relative; background: #111;
-  border-radius: 16px; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
 }
 #remote-video {
-  position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover;
 }
+
 #local-video {
-  position: fixed;
-  bottom: 120px; right: 24px;
-  width: 180px; height: 120px;
+  position: absolute;
+  top: calc(var(--header-h) + 12px); right: 14px;
+  width: 110px; height: 160px;
   border-radius: 12px; overflow: hidden;
-  border: 2px solid rgba(255,255,255,.2);
-  background: #222; z-index: 10;
-  object-fit: cover;
+  border: 2px solid rgba(255,255,255,.15);
+  background: #111; object-fit: cover; z-index: 5;
+  display: none; /* shown only for video calls */
 }
-.call-info {
+@media (min-width: 480px) {
+  #local-video { width: 160px; height: 110px; top: auto; bottom: 110px; right: 20px; }
+}
+
+.call-top {
   position: relative; z-index: 5;
-  text-align: center; color: #fff;
+  padding: 16px 14px; padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  display: flex; align-items: center; justify-content: space-between;
 }
-.call-peer-name { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
-.call-status { font-size: 18px; opacity: .7; }
-.call-timer { font-size: 18px; color: var(--green); margin-top: 8px; font-variant-numeric: tabular-nums; }
+.call-back {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,.12); border: none; color: #fff;
+  cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.call-type-badge {
+  background: rgba(255,255,255,.12); border-radius: 20px;
+  padding: 6px 14px; font-size: 13px; color: rgba(255,255,255,.8); font-weight: 600;
+}
+
+.call-center {
+  position: relative; z-index: 5;
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+  text-align: center;
+}
+.call-av {
+  width: 90px; height: 90px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 700; color: #fff;
+  box-shadow: 0 0 0 0 rgba(124,106,247,.5);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(124,106,247,.5); }
+  70%  { box-shadow: 0 0 0 20px rgba(124,106,247,0); }
+  100% { box-shadow: 0 0 0 0 rgba(124,106,247,0); }
+}
+.call-av.connected { animation: none; }
+.call-peer-nm { font-size: 28px; font-weight: 700; color: #fff; }
+.call-stat    { font-size: 16px; color: rgba(255,255,255,.6); }
+.call-timer   { font-size: 18px; color: var(--green); font-variant-numeric: tabular-nums; display: none; }
 
 .call-controls {
-  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-  display: flex; align-items: center; gap: 16px; z-index: 10;
+  position: relative; z-index: 5;
+  padding: 0 20px calc(20px + var(--safe-b));
+  display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;
 }
-.ctrl-btn {
-  width: 60px; height: 60px; border-radius: 50%;
-  border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; transition: all .2s;
-  background: rgba(255,255,255,.15); color: #fff;
+.cc-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  -webkit-tap-highlight-color: transparent;
 }
-.ctrl-btn:hover { background: rgba(255,255,255,.25); transform: scale(1.05); }
-.ctrl-btn.danger { background: var(--red); }
-.ctrl-btn.danger:hover { background: #dc2626; }
-.ctrl-btn.active { background: var(--green); }
-.ctrl-btn.muted { background: rgba(239,68,68,.5); }
+.cc-btn button {
+  width: 60px; height: 60px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,.14); color: #fff; font-size: 22px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .15s; backdrop-filter: blur(6px);
+}
+.cc-btn button:active { transform: scale(.92); }
+.cc-btn button.danger { background: var(--red); }
+.cc-btn button.active-g { background: rgba(34,197,94,.4); }
+.cc-btn button.active-r { background: rgba(239,68,68,.4); }
+.cc-btn span { font-size: 11px; color: rgba(255,255,255,.6); }
 
-/* Incoming call banner */
-.incoming-call {
-  position: fixed; bottom: 32px; right: 32px; z-index: 250;
+/* ── Incoming call banner ─────────────────────── */
+#incoming-banner {
+  position: fixed; bottom: calc(20px + var(--safe-b)); right: 16px; left: 16px;
+  z-index: 160; display: none;
+}
+@media (min-width: 480px) {
+  #incoming-banner { left: auto; width: 300px; }
+}
+#incoming-banner.show { display: block; }
+
+.inc-card {
   background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 20px; padding: 20px 24px;
+  border-radius: 18px; padding: 18px 18px 16px;
   box-shadow: var(--shadow);
-  display: none; min-width: 280px;
-  animation: slideIn .3s ease;
+  animation: slideUp .3s ease;
 }
-.incoming-call.show { display: block; }
-@keyframes slideIn {
-  from { transform: translateY(100px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes slideUp {
+  from { transform: translateY(80px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
 }
-.incoming-header { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
-.incoming-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-.incoming-type { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
-.incoming-actions { display: flex; gap: 12px; }
-.btn-accept { background: var(--green); color: #fff; }
-.btn-accept:hover { background: #16a34a; }
-.btn-decline { background: var(--red); color: #fff; }
-.btn-decline:hover { background: #dc2626; }
+.inc-label { font-size: 12px; color: var(--text2); margin-bottom: 3px; }
+.inc-name  { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+.inc-type  { font-size: 13px; color: var(--text2); margin-bottom: 14px; }
+.inc-btns  { display: flex; gap: 10px; }
+.inc-btns button {
+  flex: 1; padding: 12px; border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.inc-accept  { background: var(--green); color: #fff; }
+.inc-decline { background: var(--red);   color: #fff; }
+.inc-accept:active  { background: #16a34a; }
+.inc-decline:active { background: #dc2626; }
 
-/* ── Toast Notification ─────────────────────────────── */
-.toast {
-  position: fixed; top: 24px; right: 24px; z-index: 400;
+/* ── Toast ──────────────────────────────────── */
+#toast {
+  position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: 50%;
+  transform: translateX(-50%) translateY(-80px);
   background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 12px; padding: 14px 18px;
-  box-shadow: var(--shadow); max-width: 320px;
-  transform: translateX(120%); transition: transform .3s;
-  font-size: 14px;
+  border-radius: 12px; padding: 12px 18px;
+  font-size: 14px; box-shadow: var(--shadow);
+  z-index: 300; white-space: nowrap; max-width: 90vw;
+  overflow: hidden; text-overflow: ellipsis;
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
 }
-.toast.show { transform: translateX(0); }
-.toast-success { border-left: 3px solid var(--green); }
-.toast-error { border-left: 3px solid var(--red); }
+#toast.show { transform: translateX(-50%) translateY(0); }
+#toast.err  { border-left: 3px solid var(--red); }
+#toast.ok   { border-left: 3px solid var(--green); }
 
-/* ── Date divider ──────────────────────────────────── */
-.date-divider {
-  display: flex; align-items: center; gap: 12px;
-  margin: 12px 0; color: var(--text3); font-size: 12px;
-}
-.date-divider::before, .date-divider::after {
-  content: ''; flex: 1; height: 1px; background: var(--border);
-}
-
-/* ── Responsive ─────────────────────────────────────── */
-.menu-btn { display: none; }
-
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed; left: 0; top: 0; bottom: 0; z-index: 50;
-    transform: translateX(-100%);
-  }
-  .sidebar.open { transform: translateX(0); }
-  .menu-btn {
-    display: flex; align-items: center; justify-content: center;
-    width: 40px; height: 40px; border-radius: 10px;
-    background: var(--bg3); border: 1px solid var(--border);
-    color: var(--text2); cursor: pointer; flex-shrink: 0;
-  }
-  .sidebar-backdrop {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,.5); z-index: 49;
-  }
-  .sidebar-backdrop.show { display: block; }
-  #local-video { width: 120px; height: 80px; }
-}
-
-/* ── Scrollbar global ─────────────────────────────── */
-html { scrollbar-width: thin; scrollbar-color: var(--bg4) transparent; }
-
-/* ── Loader ──────────────────────────────────────── */
+/* ── Misc ───────────────────────────────────── */
 .loader {
-  width: 20px; height: 20px; border: 2px solid rgba(255,255,255,.2);
+  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.2);
   border-top-color: #fff; border-radius: 50%;
   animation: spin .6s linear infinite; display: inline-block;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-.loading-msgs {
-  display: flex; justify-content: center; padding: 20px;
-  color: var(--text3); font-size: 14px; gap: 8px; align-items: center;
-}
-
-/* SVG icons inline */
-svg { display: inline-block; vertical-align: middle; }
+.centered { text-align: center; padding: 24px; color: var(--text3); font-size: 14px; }
 </style>
 </head>
 <body>
 
-<!-- ══ AUTH SCREEN ════════════════════════════════ -->
+<!-- ══ AUTH ══════════════════════════════════════════ -->
 <div id="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">
@@ -558,1180 +576,983 @@ svg { display: inline-block; vertical-align: middle; }
       <h1>ChatApp</h1>
       <p>Private, real-time messaging</p>
     </div>
+
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchTab('login')">Sign In</button>
-      <button class="auth-tab" onclick="switchTab('register')">Register</button>
+      <button class="auth-tab"        onclick="switchTab('register')">Register</button>
     </div>
-    <div class="auth-error" id="auth-error"></div>
 
-    <!-- Login form -->
+    <div class="auth-err" id="auth-err"></div>
+
     <div id="form-login">
       <div class="form-group">
-        <label>Email or Username</label>
-        <input type="text" id="login-email" placeholder="you@example.com" autocomplete="email">
+        <label>EMAIL OR USERNAME</label>
+        <input id="li-email" type="text" placeholder="you@example.com" autocomplete="email" inputmode="email">
       </div>
       <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+        <label>PASSWORD</label>
+        <input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password">
       </div>
-      <button class="btn btn-primary" onclick="doLogin()">
-        <span id="login-btn-text">Sign In</span>
-      </button>
+      <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
     </div>
 
-    <!-- Register form -->
-    <div id="form-register" style="display:none">
+    <div id="form-reg" style="display:none">
       <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="reg-username" placeholder="cooluser123">
+        <label>USERNAME</label>
+        <input id="rg-user" type="text" placeholder="cooluser" autocomplete="username">
       </div>
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="reg-email" placeholder="you@example.com">
+        <label>EMAIL</label>
+        <input id="rg-email" type="email" placeholder="you@example.com" autocomplete="email" inputmode="email">
       </div>
       <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="reg-password" placeholder="min 6 characters">
+        <label>PASSWORD</label>
+        <input id="rg-pass" type="password" placeholder="min 6 characters" autocomplete="new-password">
       </div>
-      <button class="btn btn-primary" onclick="doRegister()">
-        <span id="reg-btn-text">Create Account</span>
-      </button>
+      <button class="btn btn-primary" id="reg-btn" onclick="doRegister()">Create Account</button>
     </div>
   </div>
 </div>
 
-<!-- ══ APP ════════════════════════════════════════ -->
+<!-- ══ APP ════════════════════════════════════════════ -->
 <div id="app" class="hidden">
 
-  <!-- Mobile sidebar backdrop -->
-  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+  <div class="sidebar-backdrop" id="sb-backdrop" onclick="closeSidebar()"></div>
 
-  <!-- ── Sidebar ── -->
-  <div class="sidebar" id="sidebar">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>Messages</h2>
       <div class="sidebar-actions">
-        <button class="btn-icon btn" title="New conversation" onclick="openNewConvo()">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
+        <button class="btn-icon btn" title="New chat" onclick="openNewConvoModal()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
         </button>
       </div>
     </div>
 
-    <div class="search-box">
-      <div class="search-input-wrap">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input type="text" id="conv-search" placeholder="Search conversations…" oninput="filterConvs(this.value)">
+    <div class="search-wrap">
+      <div class="search-inner">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="search" placeholder="Search conversations…" oninput="filterConvs(this.value)">
       </div>
     </div>
 
     <div class="conv-list" id="conv-list">
-      <div class="loading-msgs">
-        <span class="loader"></span> Loading…
-      </div>
+      <div class="centered"><span class="loader"></span></div>
     </div>
 
     <div class="sidebar-footer">
       <div class="avatar">
-        <div class="avatar-img" id="me-avatar"></div>
-        <span class="status-dot online"></span>
+        <div class="av-img" id="me-av"></div>
+        <span class="av-dot online"></span>
       </div>
-      <div class="me-info">
-        <div class="me-name" id="me-name">Loading…</div>
+      <div style="flex:1;min-width:0">
+        <div class="me-name" id="me-name">…</div>
         <div class="me-status">● Online</div>
       </div>
       <button class="btn-icon btn" title="Sign out" onclick="doLogout()">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
-        </svg>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       </button>
     </div>
-  </div>
+  </nav>
 
-  <!-- ── Chat Area ── -->
-  <div class="chat-area" id="chat-area">
+  <!-- Chat -->
+  <main class="chat-area" id="chat-area">
+
+    <!-- Empty state -->
     <div class="chat-empty" id="chat-empty">
-      <div class="icon">💬</div>
+      <div class="ei">💬</div>
       <h3>Select a conversation</h3>
-      <p>Choose from the left or start a new chat</p>
-      <button class="btn btn-primary" style="width:auto;margin-top:8px" onclick="openNewConvo()">
-        New Conversation
-      </button>
+      <p>Pick one from the left or start a new chat</p>
+      <button class="btn btn-primary" style="width:auto;margin-top:8px" onclick="openNewConvoModal()">New Conversation</button>
     </div>
 
-    <!-- Chat header (hidden until convo selected) -->
-    <div class="chat-header" id="chat-header" style="display:none">
-      <div style="display:flex;align-items:center;gap:12px">
-        <button class="menu-btn" onclick="openSidebar()">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M3 12h18M3 6h18M3 18h18"/>
-          </svg>
+    <!-- Header (hidden until convo open) -->
+    <header class="chat-header" id="chat-header" style="display:none">
+      <div class="chat-header-left">
+        <button class="back-btn" onclick="goBack()" aria-label="Back">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
-        <div class="chat-header-left">
-          <div class="avatar">
-            <div class="avatar-img" id="peer-avatar"></div>
-            <span class="status-dot" id="peer-status-dot"></span>
-          </div>
-          <div class="chat-header-info">
-            <div class="chat-peer-name" id="peer-name"></div>
-            <div class="chat-peer-status" id="peer-status-text">Offline</div>
-          </div>
+        <div class="avatar">
+          <div class="av-img" id="peer-av"></div>
+          <span class="av-dot" id="peer-dot"></span>
+        </div>
+        <div>
+          <div class="peer-name" id="peer-nm"></div>
+          <div class="peer-status" id="peer-st">Offline</div>
         </div>
       </div>
-      <div class="chat-header-actions">
+      <div class="chat-actions">
         <button class="call-btn" title="Voice call" onclick="startCall('audio')">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.06 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.08a16 16 0 0 0 6.08 6.08l1.25-1.26a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.07 16.92z"/>
-          </svg>
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.06 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.08a16 16 0 0 0 6.08 6.08l1.25-1.26a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.07 16.92z"/></svg>
         </button>
-        <button class="call-btn video" title="Video call" onclick="startCall('video')">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-          </svg>
+        <button class="call-btn" title="Video call" onclick="startCall('video')">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
         </button>
       </div>
-    </div>
+    </header>
 
     <!-- Messages -->
-    <div class="messages-container" id="messages-container" style="display:none" onscroll="handleMsgScroll()">
-    </div>
+    <div class="msgs" id="msgs" style="display:none" onscroll="onMsgsScroll()"></div>
 
-    <!-- Chat input -->
-    <div class="chat-input-area" id="chat-input-area" style="display:none">
-      <div class="chat-input-row">
-        <textarea class="chat-input" id="chat-input" placeholder="Type a message…" rows="1"
-          onkeydown="handleInputKey(event)" oninput="handleInputChange()"></textarea>
-        <button class="send-btn" id="send-btn" onclick="sendMessage()">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg>
+    <!-- Input -->
+    <div class="chat-input-bar" id="chat-input-bar" style="display:none">
+      <div class="input-row">
+        <textarea class="chat-ta" id="chat-ta" placeholder="Message…" rows="1"
+          onkeydown="onTaKey(event)" oninput="onTaInput()"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMsg()">
+          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
       </div>
     </div>
-  </div>
+  </main>
 </div>
 
-<!-- ══ MODALS ════════════════════════════════════ -->
-
-<!-- New Conversation Modal -->
-<div class="modal-overlay" id="new-convo-modal">
+<!-- ══ NEW CONVO MODAL ════════════════════════════════ -->
+<div class="overlay" id="modal-new" onclick="overlayClick(event,'modal-new')">
   <div class="modal">
-    <div class="modal-header">
+    <div class="modal-head">
       <h3>New Conversation</h3>
-      <button class="modal-close" onclick="closeModal('new-convo-modal')">×</button>
+      <button class="modal-close" onclick="closeModal('modal-new')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="search-input-wrap">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        <input type="text" id="user-search-input" placeholder="Search by name or email…"
-          oninput="searchUsers(this.value)">
+      <div class="search-inner" style="margin-bottom:12px">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="usr-search" type="search" placeholder="Search by name or email…" oninput="searchUsers(this.value)">
       </div>
-      <div class="search-results" id="user-search-results">
-        <div class="search-no-results">Search for someone to start chatting</div>
-      </div>
+      <div id="usr-results"><div class="no-res">Type to search for people</div></div>
     </div>
   </div>
 </div>
 
-<!-- ══ CALL UI ════════════════════════════════════ -->
-<div class="call-overlay" id="call-overlay">
-  <video id="remote-video" autoplay playsinline></video>
+<!-- ══ CALL SCREEN ════════════════════════════════════ -->
+<div id="call-screen">
+  <!-- Remote video fills background -->
+  <div class="video-bg"><video id="remote-video" autoplay playsinline></video></div>
+  <!-- Local video PiP -->
   <video id="local-video" autoplay playsinline muted></video>
 
-  <div class="call-info" id="call-info">
-    <div class="call-peer-name" id="call-peer-name"></div>
-    <div class="call-status" id="call-status">Calling…</div>
-    <div class="call-timer" id="call-timer" style="display:none">00:00</div>
+  <!-- Top bar -->
+  <div class="call-top">
+    <button class="call-back" onclick="endCall(true)" title="Minimize">↙</button>
+    <div class="call-type-badge" id="call-type-badge">Audio Call</div>
+    <div style="width:40px"></div>
   </div>
 
+  <!-- Center info -->
+  <div class="call-center">
+    <div class="call-av" id="call-av"></div>
+    <div class="call-peer-nm" id="call-peer-nm"></div>
+    <div class="call-stat"    id="call-stat">Calling…</div>
+    <div class="call-timer"   id="call-timer"></div>
+  </div>
+
+  <!-- Controls -->
   <div class="call-controls">
-    <button class="ctrl-btn" id="btn-mute" onclick="toggleMute()" title="Mute">
-      🎤
-    </button>
-    <button class="ctrl-btn danger" onclick="endCall(true)" title="End call">
-      📵
-    </button>
-    <button class="ctrl-btn" id="btn-cam" onclick="toggleCamera()" title="Camera">
-      📷
-    </button>
-    <button class="ctrl-btn" id="btn-speaker" onclick="toggleSpeaker()" title="Speaker">
-      🔊
-    </button>
+    <div class="cc-btn">
+      <button id="btn-mute" onclick="toggleMute()">🎤</button>
+      <span>Mute</span>
+    </div>
+    <div class="cc-btn">
+      <button class="danger" onclick="endCall(true)">📵</button>
+      <span>End</span>
+    </div>
+    <div class="cc-btn">
+      <button id="btn-cam" onclick="toggleCam()">📷</button>
+      <span>Camera</span>
+    </div>
+    <div class="cc-btn">
+      <button id="btn-spk" onclick="toggleSpeaker()">🔊</button>
+      <span>Speaker</span>
+    </div>
   </div>
 </div>
 
-<!-- Incoming call banner -->
-<div class="incoming-call" id="incoming-call">
-  <div class="incoming-header">Incoming call</div>
-  <div class="incoming-name" id="incoming-name"></div>
-  <div class="incoming-type" id="incoming-type"></div>
-  <div class="incoming-actions">
-    <button class="btn btn-accept" onclick="acceptCall()">Accept</button>
-    <button class="btn btn-decline" onclick="rejectCall()">Decline</button>
+<!-- ══ INCOMING CALL BANNER ════════════════════════════ -->
+<div id="incoming-banner">
+  <div class="inc-card">
+    <div class="inc-label">Incoming call</div>
+    <div class="inc-name" id="inc-name"></div>
+    <div class="inc-type" id="inc-type"></div>
+    <div class="inc-btns">
+      <button class="inc-accept"  onclick="acceptCall()">Accept</button>
+      <button class="inc-decline" onclick="rejectCall()">Decline</button>
+    </div>
   </div>
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+<!-- ══ TOAST ══════════════════════════════════════════ -->
+<div id="toast"></div>
 
 <script>
-// ╔══════════════════════════════════════════════════════╗
-// ║  ChatApp — Client Application                        ║
-// ╚══════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════╗
+// ║  ChatApp Client — fixed calls + mobile layout    ║
+// ╚══════════════════════════════════════════════════╝
 
-// ── Config ────────────────────────────────────────────
-// IMPORTANT: Replace with your deployed Cloudflare Worker URL
-const API_BASE = 'https://chatapp-worker.shabeershz21.workers.dev';
-const WS_BASE  = API_BASE.replace('https://', 'wss://').replace('http://', 'ws://');
+// ─── CONFIG — update this to your worker URL ───────
+const API  = 'https://YOUR_WORKER.workers.dev';
+const WS   = API.replace(/^https?/, m => m === 'https' ? 'wss' : 'ws');
 
-// ── App State ─────────────────────────────────────────
-const state = {
-  token: localStorage.getItem('chatapp_token'),
-  user: JSON.parse(localStorage.getItem('chatapp_user') || 'null'),
-  conversations: [],
-  activeConvoId: null,
-  activePeerId: null,
-  activePeerName: null,
-  messages: {},
+// ─── STATE ──────────────────────────────────────────
+const S = {
+  token: localStorage.getItem('ca_tok'),
+  user:  JSON.parse(localStorage.getItem('ca_usr') || 'null'),
+  convos: [],
+  activeConvo: null,   // { id, peerId, peerName, peerAvatar }
+  msgs: {},            // convoId → []
   ws: null,
-  wsReconnectTimer: null,
-  typingTimers: {},
-  isTyping: false,
+  pingInterval: null,
+  typingOut: false,
   typingDebounce: null,
+  typingEl: null,
   onlineUsers: new Set(),
-  msgPage: {},
   loadingMsgs: false,
-  // Call state
   call: {
     active: false,
-    incoming: null,
-    peer: null,            // SimplePeer instance
+    incoming: null,    // raw WS offer message
+    pc: null,          // RTCPeerConnection
     localStream: null,
-    remoteStream: null,
-    type: null,            // 'audio' | 'video'
+    type: null,        // 'audio'|'video'
     peerId: null,
     peerName: null,
     convoId: null,
     startedAt: null,
-    timerInterval: null,
+    timerIv: null,
     muted: false,
     camOff: false,
-    iceCandidateQueue: [],
+    pendingCandidates: [],  // ICE candidates queued before remote desc set
   }
 };
 
-// ── Utilities ─────────────────────────────────────────
-function $(id) { return document.getElementById(id); }
-
-function showToast(msg, type = 'success') {
-  const t = $('toast');
-  t.textContent = msg;
-  t.className = `toast toast-${type} show`;
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-function formatTime(ts) {
+// ─── UTILS ──────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const initials = n => (n||'?').split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2);
+const tsFormat = ts => {
   if (!ts) return '';
-  const d = new Date(ts * 1000);
-  const now = new Date();
-  const isToday = d.toDateString() === now.toDateString();
-  if (isToday) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  const d = new Date(ts*1000), now = new Date();
+  return d.toDateString()===now.toDateString()
+    ? d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
+    : d.toLocaleDateString([],{month:'short',day:'numeric'});
+};
+const durFormat = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+
+function toast(msg, type='ok') {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className = '', 3000);
 }
 
-function formatDuration(s) {
-  const m = Math.floor(s / 60), sec = s % 60;
-  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+function setAv(el, name, url) {
+  el.innerHTML = url ? `<img src="${esc(url)}" alt="">` : initials(name);
 }
 
-function getInitials(name) {
-  return (name || '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-}
-
-function setAvatar(el, name, url) {
-  if (url) {
-    el.innerHTML = `<img src="${url}" alt="${name}">`;
-  } else {
-    el.textContent = getInitials(name);
-  }
-}
-
-// ── API Helpers ───────────────────────────────────────
-async function api(path, opts = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
+// ─── API ────────────────────────────────────────────
+async function api(path, opts={}) {
+  const r = await fetch(`${API}${path}`, {
     ...opts,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${state.token}`,
-      ...(opts.headers || {})
-    },
+    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${S.token}`, ...(opts.headers||{}) },
     body: opts.body ? JSON.stringify(opts.body) : undefined
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-  return data;
+  const d = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+  return d;
 }
 
-// ── Auth ──────────────────────────────────────────────
-function switchTab(tab) {
-  $('form-login').style.display = tab === 'login' ? 'block' : 'none';
-  $('form-register').style.display = tab === 'register' ? 'block' : 'none';
-  document.querySelectorAll('.auth-tab').forEach((el, i) => {
-    el.classList.toggle('active', (i === 0) === (tab === 'login'));
-  });
-  hideAuthError();
+// ─── AUTH ────────────────────────────────────────────
+function switchTab(t) {
+  $('form-login').style.display = t==='login' ? '' : 'none';
+  $('form-reg').style.display   = t==='reg'   ? '' : 'none';
+  document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',(i===0)===(t==='login')));
+  hideErr();
 }
-
-function showAuthError(msg) {
-  const el = $('auth-error');
-  el.textContent = msg;
-  el.classList.add('show');
-}
-function hideAuthError() { $('auth-error').classList.remove('show'); }
+function showErr(m) { const e=$('auth-err'); e.textContent=m; e.classList.add('show'); }
+function hideErr()  { $('auth-err').classList.remove('show'); }
 
 async function doLogin() {
-  const email = $('login-email').value.trim();
-  const password = $('login-password').value;
-  if (!email || !password) return showAuthError('Enter email and password');
-  $('login-btn-text').innerHTML = '<span class="loader"></span>';
-  try {
-    const data = await api('/api/auth/login', { method: 'POST', body: { email, password } });
-    saveSession(data);
-    initApp();
-  } catch (e) {
-    showAuthError(e.message);
-  } finally {
-    $('login-btn-text').textContent = 'Sign In';
-  }
+  const email=$('li-email').value.trim(), pass=$('li-pass').value;
+  if (!email||!pass) return showErr('Enter email/username and password');
+  $('login-btn').innerHTML = '<span class="loader"></span>';
+  try { saveSession(await api('/api/auth/login',{method:'POST',body:{email,password:pass}})); initApp(); }
+  catch(e) { showErr(e.message); }
+  finally  { $('login-btn').textContent='Sign In'; }
 }
 
 async function doRegister() {
-  const username = $('reg-username').value.trim();
-  const email = $('reg-email').value.trim();
-  const password = $('reg-password').value;
-  if (!username || !email || !password) return showAuthError('All fields required');
-  $('reg-btn-text').innerHTML = '<span class="loader"></span>';
-  try {
-    const data = await api('/api/auth/register', { method: 'POST', body: { username, email, password } });
-    saveSession(data);
-    initApp();
-  } catch (e) {
-    showAuthError(e.message);
-  } finally {
-    $('reg-btn-text').textContent = 'Create Account';
-  }
+  const username=$('rg-user').value.trim(), email=$('rg-email').value.trim(), password=$('rg-pass').value;
+  if (!username||!email||!password) return showErr('All fields required');
+  $('reg-btn').innerHTML = '<span class="loader"></span>';
+  try { saveSession(await api('/api/auth/register',{method:'POST',body:{username,email,password}})); initApp(); }
+  catch(e) { showErr(e.message); }
+  finally  { $('reg-btn').textContent='Create Account'; }
 }
 
-function saveSession({ token, user }) {
-  state.token = token;
-  state.user = user;
-  localStorage.setItem('chatapp_token', token);
-  localStorage.setItem('chatapp_user', JSON.stringify(user));
+function saveSession({token,user}) {
+  S.token=token; S.user=user;
+  localStorage.setItem('ca_tok',token);
+  localStorage.setItem('ca_usr',JSON.stringify(user));
 }
 
 async function doLogout() {
-  try { await api('/api/auth/logout', { method: 'POST' }); } catch {}
-  localStorage.removeItem('chatapp_token');
-  localStorage.removeItem('chatapp_user');
-  state.token = null;
-  state.user = null;
-  if (state.ws) state.ws.close();
+  try { await api('/api/auth/logout',{method:'POST'}); } catch{}
+  localStorage.removeItem('ca_tok'); localStorage.removeItem('ca_usr');
+  S.token=null; S.user=null;
+  if (S.ws) S.ws.close();
   $('auth-screen').classList.remove('hidden');
   $('app').classList.add('hidden');
 }
 
-// ── App Init ──────────────────────────────────────────
+// ─── INIT ────────────────────────────────────────────
 function initApp() {
   $('auth-screen').classList.add('hidden');
   $('app').classList.remove('hidden');
-  // Set my info
-  $('me-name').textContent = state.user.username;
-  setAvatar($('me-avatar'), state.user.username, state.user.avatar_url);
-  // Load data
-  loadConversations();
+  $('me-name').textContent = S.user.username;
+  setAv($('me-av'), S.user.username, S.user.avatar_url);
+  loadConvos();
   connectWS();
 }
 
-// Enter key for auth
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    if ($('form-login').style.display !== 'none') doLogin();
-    else doRegister();
-  }
-});
-
-// ── WebSocket ─────────────────────────────────────────
+// ─── WEBSOCKET ───────────────────────────────────────
 function connectWS() {
-  if (state.ws && state.ws.readyState < 2) return;
-  const url = `${WS_BASE}/ws?token=${state.token}`;
-  const ws = new WebSocket(url);
-  state.ws = ws;
-
+  if (S.ws && S.ws.readyState < 2) return;
+  const ws = new WebSocket(`${WS}/ws?token=${S.token}`);
+  S.ws = ws;
   ws.onopen = () => {
-    console.log('[WS] Connected');
-    // Start ping keepalive
-    state.pingInterval = setInterval(() => {
-      if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' }));
-    }, 25000);
+    S.pingInterval = setInterval(()=>{ if(ws.readyState===1) ws.send('{"type":"ping"}'); }, 25000);
   };
-
-  ws.onmessage = ({ data }) => {
-    try { handleWsMessage(JSON.parse(data)); } catch {}
-  };
-
-  ws.onclose = () => {
-    console.log('[WS] Disconnected, reconnecting in 3s…');
-    clearInterval(state.pingInterval);
-    state.wsReconnectTimer = setTimeout(connectWS, 3000);
-  };
-
-  ws.onerror = () => ws.close();
+  ws.onmessage = ({data}) => { try { onWsMsg(JSON.parse(data)); } catch{} };
+  ws.onclose  = () => { clearInterval(S.pingInterval); setTimeout(connectWS,3000); };
+  ws.onerror  = () => ws.close();
 }
 
-function wsSend(obj) {
-  if (state.ws?.readyState === WebSocket.OPEN) {
-    state.ws.send(JSON.stringify(obj));
-  }
-}
+function wsSend(obj) { if (S.ws?.readyState===1) S.ws.send(JSON.stringify(obj)); }
 
-function handleWsMessage(msg) {
-  switch (msg.type) {
+function onWsMsg(msg) {
+  switch(msg.type) {
     case 'pong': break;
 
     case 'chat': {
       const cid = msg.convo_id;
-      // Add to messages
-      if (!state.messages[cid]) state.messages[cid] = [];
-      // Dedup by id
-      if (!state.messages[cid].find(m => m.id === msg.id)) {
-        state.messages[cid].push(msg);
-      }
-      // Re-render if active convo
-      if (state.activeConvoId === cid) {
-        renderMessages();
-        // Send read receipt
-        wsSend({ type: 'read', convo_id: cid });
-      }
-      // Update sidebar preview
+      if (!S.msgs[cid]) S.msgs[cid] = [];
+      // Replace optimistic temp msg or append
+      const ti = S.msgs[cid].findIndex(m=>m.temp_id && m.temp_id===msg.temp_id);
+      if (ti >= 0) S.msgs[cid][ti] = msg;
+      else if (!S.msgs[cid].find(m=>m.id===msg.id)) S.msgs[cid].push(msg);
+
+      if (S.activeConvo?.id === cid) { renderMsgs(); wsSend({type:'read',convo_id:cid}); }
       updateConvPreview(cid, msg);
-      // Show notification if not active
-      if (state.activeConvoId !== cid) {
-        showToast(`${msg.sender_name}: ${msg.content.slice(0, 50)}`);
-      }
+      if (S.activeConvo?.id !== cid) toast(`${msg.sender_name}: ${msg.content.slice(0,50)}`);
       break;
     }
 
-    case 'typing': {
-      if (msg.convo_id === state.activeConvoId && msg.user_id !== state.user.id) {
-        showTypingIndicator(msg.is_typing);
-      }
+    case 'typing':
+      if (msg.convo_id===S.activeConvo?.id && msg.user_id!==S.user.id)
+        showTyping(msg.is_typing);
       break;
-    }
 
-    case 'read': {
-      if (msg.convo_id === state.activeConvoId) {
-        renderMessages(); // refresh read receipts
-      }
+    case 'read':
+      if (msg.convo_id===S.activeConvo?.id) renderMsgs();
       break;
-    }
 
-    case 'user_status': {
-      if (msg.status === 'online') state.onlineUsers.add(msg.user_id);
-      else state.onlineUsers.delete(msg.user_id);
-      updateUserStatus(msg.user_id, msg.status);
+    case 'user_status':
+      msg.status==='online' ? S.onlineUsers.add(msg.user_id) : S.onlineUsers.delete(msg.user_id);
+      updatePeerStatus(msg.user_id, msg.status);
       break;
-    }
 
-    // WebRTC signaling
-    case 'call_offer': handleIncomingOffer(msg); break;
-    case 'call_answer': handleCallAnswer(msg); break;
-    case 'call_reject': handleCallRejected(msg); break;
-    case 'call_end': handleCallEnded(msg); break;
-    case 'ice_candidate': handleIceCandidate(msg); break;
+    case 'call_offer':    onCallOffer(msg);    break;
+    case 'call_answer':   onCallAnswer(msg);   break;
+    case 'call_reject':   onCallReject(msg);   break;
+    case 'call_end':      onCallEnd(msg);      break;
+    case 'ice_candidate': onIceCandidate(msg); break;
   }
 }
 
-// ── Conversations ─────────────────────────────────────
-async function loadConversations() {
+// ─── CONVERSATIONS ───────────────────────────────────
+async function loadConvos() {
   try {
-    const convos = await api('/api/conversations');
-    state.conversations = convos;
-    renderConvList(convos);
-  } catch (e) {
-    $('conv-list').innerHTML = '<div class="search-no-results">Failed to load</div>';
-  }
+    S.convos = await api('/api/conversations');
+    renderConvList(S.convos);
+  } catch { $('conv-list').innerHTML='<div class="centered">Failed to load</div>'; }
 }
 
 function renderConvList(convos) {
   const el = $('conv-list');
-  if (!convos.length) {
-    el.innerHTML = '<div class="search-no-results" style="padding:24px">No conversations yet.<br>Click + to start one.</div>';
-    return;
-  }
-  el.innerHTML = convos.map(c => convItem(c)).join('');
-}
-
-function convItem(c) {
-  const online = state.onlineUsers.has(c.peer_id) || c.peer_status === 'online';
-  const initials = getInitials(c.peer_name);
-  const preview = c.last_msg
-    ? (c.last_sender === state.user.id ? `You: ${c.last_msg}` : c.last_msg)
-    : 'Start chatting';
-  const isActive = state.activeConvoId === c.id;
-  return `
-    <div class="conv-item ${isActive ? 'active' : ''}" onclick="openConvo('${c.id}','${c.peer_id}','${escHtml(c.peer_name)}','${c.peer_avatar||''}')">
+  if (!convos.length) { el.innerHTML='<div class="centered">No conversations yet.<br>Click + to start one.</div>'; return; }
+  el.innerHTML = convos.map(c => {
+    const online = S.onlineUsers.has(c.peer_id) || c.peer_status==='online';
+    const isMe   = c.last_sender===S.user.id;
+    const prev   = c.last_msg ? (isMe?`You: ${c.last_msg}`:c.last_msg) : 'Say hello!';
+    const active = S.activeConvo?.id===c.id;
+    return `<div class="conv-item${active?' active':''}" onclick="openConvo('${c.id}','${c.peer_id}','${esc(c.peer_name)}','${c.peer_avatar||''}')">
       <div class="avatar">
-        <div class="avatar-img">${c.peer_avatar ? `<img src="${c.peer_avatar}">` : initials}</div>
-        <span class="status-dot ${online ? 'online' : ''}"></span>
+        <div class="av-img">${c.peer_avatar?`<img src="${esc(c.peer_avatar)}">`:`${initials(c.peer_name)}`}</div>
+        <span class="av-dot${online?' online':''}"></span>
       </div>
       <div class="conv-info">
-        <div class="conv-name">${escHtml(c.peer_name)}</div>
-        <div class="conv-preview">${escHtml(preview.slice(0, 60))}</div>
+        <div class="conv-name">${esc(c.peer_name)}</div>
+        <div class="conv-prev">${esc(prev.slice(0,60))}</div>
       </div>
       <div class="conv-meta">
-        <span class="conv-time">${formatTime(c.last_msg_at)}</span>
-        ${c.unread > 0 ? `<span class="unread-badge">${c.unread}</span>` : ''}
+        <span class="conv-time">${tsFormat(c.last_msg_at)}</span>
+        ${c.unread>0?`<span class="badge">${c.unread}</span>`:''}
       </div>
     </div>`;
-}
-
-function updateConvPreview(convoId, msg) {
-  const c = state.conversations.find(x => x.id === convoId);
-  if (c) {
-    c.last_msg = msg.content;
-    c.last_msg_at = msg.created_at;
-    c.last_sender = msg.sender_id;
-    if (msg.sender_id !== state.user.id && state.activeConvoId !== convoId) {
-      c.unread = (c.unread || 0) + 1;
-    }
-    renderConvList(state.conversations);
-  }
+  }).join('');
 }
 
 function filterConvs(q) {
-  const filtered = q
-    ? state.conversations.filter(c => c.peer_name.toLowerCase().includes(q.toLowerCase()))
-    : state.conversations;
-  renderConvList(filtered);
+  renderConvList(q ? S.convos.filter(c=>c.peer_name.toLowerCase().includes(q.toLowerCase())) : S.convos);
 }
 
-function updateUserStatus(userId, status) {
-  // Update in conv list
-  state.conversations.forEach(c => {
-    if (c.peer_id === userId) c.peer_status = status;
-  });
-  renderConvList(state.conversations);
-  // Update chat header if open
-  if (state.activePeerId === userId) {
-    $('peer-status-dot').className = `status-dot ${status === 'online' ? 'online' : ''}`;
-    $('peer-status-text').textContent = status === 'online' ? 'Online' : 'Offline';
+function updateConvPreview(cid, msg) {
+  const c = S.convos.find(x=>x.id===cid);
+  if (c) {
+    c.last_msg=msg.content; c.last_msg_at=msg.created_at; c.last_sender=msg.sender_id;
+    if (msg.sender_id!==S.user.id && S.activeConvo?.id!==cid) c.unread=(c.unread||0)+1;
+    renderConvList(S.convos);
   }
 }
 
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function updatePeerStatus(uid, status) {
+  S.convos.forEach(c=>{ if(c.peer_id===uid) c.peer_status=status; });
+  renderConvList(S.convos);
+  if (S.activeConvo?.peerId===uid) {
+    $('peer-dot').className = `av-dot${status==='online'?' online':''}`;
+    $('peer-st').textContent = status==='online' ? 'Online' : 'Offline';
+  }
 }
 
-// ── Open Conversation ─────────────────────────────────
-async function openConvo(convoId, peerId, peerName, peerAvatar) {
-  state.activeConvoId = convoId;
-  state.activePeerId = peerId;
-  state.activePeerName = peerName;
-
-  // Update UI
-  $('chat-empty').style.display = 'none';
-  $('chat-header').style.display = 'flex';
-  $('messages-container').style.display = 'flex';
-  $('chat-input-area').style.display = 'block';
-  $('peer-name').textContent = peerName;
-  setAvatar($('peer-avatar'), peerName, peerAvatar);
-
-  const online = state.onlineUsers.has(peerId);
-  $('peer-status-dot').className = `status-dot ${online ? 'online' : ''}`;
-  $('peer-status-text').textContent = online ? 'Online' : 'Offline';
-
-  // Mark conv active in sidebar
-  renderConvList(state.conversations);
-
+// ─── OPEN CONVO ──────────────────────────────────────
+async function openConvo(id, peerId, peerName, peerAvatar) {
+  S.activeConvo = { id, peerId, peerName, peerAvatar };
   closeSidebar();
-  $('chat-input').focus();
 
-  // Load messages
-  if (!state.messages[convoId]) {
-    await loadMessages(convoId);
-  } else {
-    renderMessages();
-  }
+  // Show chat UI
+  $('chat-empty').style.display = 'none';
+  $('chat-header').style.display = '';
+  $('msgs').style.display = '';
+  $('chat-input-bar').style.display = '';
 
-  // Clear unread badge
-  const c = state.conversations.find(x => x.id === convoId);
-  if (c) { c.unread = 0; renderConvList(state.conversations); }
+  // Populate header
+  $('peer-nm').textContent = peerName;
+  setAv($('peer-av'), peerName, peerAvatar);
+  const online = S.onlineUsers.has(peerId);
+  $('peer-dot').className = `av-dot${online?' online':''}`;
+  $('peer-st').textContent = online ? 'Online' : 'Offline';
 
-  // Send read receipt
-  wsSend({ type: 'read', convo_id: convoId });
+  renderConvList(S.convos);
+  $('chat-ta').focus();
+
+  if (!S.msgs[id]) await loadMsgs(id);
+  else renderMsgs();
+
+  // Clear unread
+  const c = S.convos.find(x=>x.id===id);
+  if (c) { c.unread=0; renderConvList(S.convos); }
+  wsSend({ type:'read', convo_id:id });
 }
 
-async function loadMessages(convoId, before = null) {
-  if (state.loadingMsgs) return;
-  state.loadingMsgs = true;
+// Back button (mobile)
+function goBack() {
+  S.activeConvo = null;
+  $('chat-empty').style.display = '';
+  $('chat-header').style.display = 'none';
+  $('msgs').style.display = 'none';
+  $('chat-input-bar').style.display = 'none';
+  renderConvList(S.convos);
+  openSidebar();
+}
+
+async function loadMsgs(cid, before=null) {
+  if (S.loadingMsgs) return;
+  S.loadingMsgs = true;
   try {
     const qs = before ? `?before=${before}&limit=50` : '?limit=50';
-    const msgs = await api(`/api/conversations/${convoId}/messages${qs}`);
-    if (!state.messages[convoId]) state.messages[convoId] = [];
-    if (before) {
-      state.messages[convoId] = [...msgs, ...state.messages[convoId]];
-    } else {
-      state.messages[convoId] = msgs;
-    }
-    renderMessages(!!before);
-  } catch (e) {
-    showToast('Failed to load messages', 'error');
-  } finally {
-    state.loadingMsgs = false;
-  }
+    const rows = await api(`/api/conversations/${cid}/messages${qs}`);
+    if (!S.msgs[cid]) S.msgs[cid]=[];
+    S.msgs[cid] = before ? [...rows,...S.msgs[cid]] : rows;
+    renderMsgs(!!before);
+  } catch { toast('Failed to load messages','err'); }
+  finally { S.loadingMsgs=false; }
 }
 
-function renderMessages(prepend = false) {
-  const el = $('messages-container');
-  const msgs = state.messages[state.activeConvoId] || [];
-  const scrolledToBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
-  const prevScrollHeight = el.scrollHeight;
+function renderMsgs(prepend=false) {
+  const el = $('msgs');
+  const list = S.msgs[S.activeConvo?.id] || [];
+  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  const prevH = el.scrollHeight;
 
-  if (!msgs.length) {
-    el.innerHTML = '<div class="search-no-results" style="padding:32px;color:var(--text3)">No messages yet. Say hello!</div>';
-    return;
-  }
+  if (!list.length) { el.innerHTML='<div class="centered">No messages yet. Say hello!</div>'; return; }
 
-  let html = '';
-  let lastDate = null;
-  let lastSender = null;
-  let groupStart = 0;
+  let html='', lastDate=null, lastSender=null;
+  for (let i=0; i<list.length; i++) {
+    const m = list[i];
+    const mine = m.sender_id===S.user.id;
+    const d = new Date(m.created_at*1000);
+    const ds = d.toDateString();
+    const now = new Date();
 
-  for (let i = 0; i < msgs.length; i++) {
-    const m = msgs[i];
-    const mine = m.sender_id === state.user.id;
-    const d = new Date(m.created_at * 1000);
-    const dateStr = d.toDateString();
-    const isNewDate = dateStr !== lastDate;
-    const isNewSender = m.sender_id !== lastSender;
-
-    if (isNewDate) {
-      lastDate = dateStr;
-      const now = new Date();
-      const label = d.toDateString() === now.toDateString() ? 'Today'
-        : d.toDateString() === new Date(now - 86400000).toDateString() ? 'Yesterday'
-        : d.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
-      html += `<div class="date-divider">${label}</div>`;
+    if (ds!==lastDate) {
+      if (lastSender!==null) html+='</div>';
+      lastDate=ds; lastSender=null;
+      const label = ds===now.toDateString()?'Today'
+        : ds===new Date(now-86400000).toDateString()?'Yesterday'
+        : d.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});
+      html+=`<div class="date-sep">${label}</div>`;
     }
 
-    if (isNewSender || isNewDate) {
-      if (groupStart !== i) html += '</div>';
-      html += `<div class="msg-group ${mine ? 'mine' : 'theirs'}">`;
-      if (!mine && isNewSender) html += `<div class="msg-sender-name">${escHtml(m.sender_name || '')}</div>`;
-      groupStart = i;
+    const newGroup = m.sender_id!==lastSender;
+    if (newGroup) {
+      if (lastSender!==null) html+='</div>';
+      html+=`<div class="msg-group ${mine?'mine':'theirs'}">`;
+      if (!mine && newGroup) html+=`<div class="msg-sender">${esc(m.sender_name||'')}</div>`;
     }
-
     lastSender = m.sender_id;
 
-    const next = msgs[i + 1];
-    const isLastInGroup = !next || next.sender_id !== m.sender_id;
-
-    html += `<div class="msg-bubble ${m._sending ? 'msg-sending' : ''}">${escHtml(m.content)}</div>`;
-
-    if (isLastInGroup) {
-      html += `<div class="msg-meta">
-        <span>${formatTime(m.created_at)}</span>
-        ${mine && m.read_at ? '<span class="msg-read">✓✓</span>' : mine ? '<span>✓</span>' : ''}
+    const next = list[i+1];
+    const lastInGroup = !next || next.sender_id!==m.sender_id;
+    html+=`<div class="bubble${m._tmp?' sending':''}">${esc(m.content)}</div>`;
+    if (lastInGroup) {
+      html+=`<div class="msg-meta">
+        <span>${tsFormat(m.created_at)}</span>
+        ${mine?(m.read_at?'<span class="read-tick">✓✓</span>':'<span>✓</span>'):''}
       </div>`;
     }
   }
-  html += '</div>';
+  html+='</div>';
+  el.innerHTML=html;
 
-  el.innerHTML = html;
+  if (prepend) el.scrollTop = el.scrollHeight - prevH;
+  else if (atBottom || !prepend) el.scrollTop = el.scrollHeight;
+}
 
-  if (prepend) {
-    el.scrollTop = el.scrollHeight - prevScrollHeight;
-  } else if (scrolledToBottom || !prepend) {
-    el.scrollTop = el.scrollHeight;
+function onMsgsScroll() {
+  const el = $('msgs');
+  if (el.scrollTop < 80 && !S.loadingMsgs && S.activeConvo) {
+    const list = S.msgs[S.activeConvo.id]||[];
+    if (list.length>=50) loadMsgs(S.activeConvo.id, list[0]?.created_at);
   }
 }
 
-async function handleMsgScroll() {
-  const el = $('messages-container');
-  if (el.scrollTop < 80 && !state.loadingMsgs && state.activeConvoId) {
-    const msgs = state.messages[state.activeConvoId] || [];
-    if (msgs.length >= 50) {
-      await loadMessages(state.activeConvoId, msgs[0]?.created_at);
-    }
+// ─── TYPING ──────────────────────────────────────────
+function showTyping(show) {
+  const el = $('msgs');
+  if (show && !S.typingEl) {
+    S.typingEl = document.createElement('div');
+    S.typingEl.className='typing-row';
+    S.typingEl.innerHTML=`<div class="typing-dots"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div><span>${esc(S.activeConvo?.peerName)} is typing…</span>`;
+    el.appendChild(S.typingEl);
+    el.scrollTop=el.scrollHeight;
+    clearTimeout(S.typingHide);
+    S.typingHide=setTimeout(()=>showTyping(false),3000);
+  } else if (!show && S.typingEl) {
+    S.typingEl.remove(); S.typingEl=null;
   }
 }
 
-// ── Typing indicator ──────────────────────────────────
-let typingEl = null;
-function showTypingIndicator(show) {
-  const container = $('messages-container');
-  if (show) {
-    if (!typingEl) {
-      typingEl = document.createElement('div');
-      typingEl.className = 'typing-indicator';
-      typingEl.innerHTML = `
-        <div class="typing-dots">
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-          <div class="typing-dot"></div>
-        </div>
-        <span style="font-size:13px;color:var(--text3)">${escHtml(state.activePeerName)} is typing…</span>`;
-      container.appendChild(typingEl);
-    }
-    container.scrollTop = container.scrollHeight;
-    // Auto-hide after 3s
-    clearTimeout(state.typingTimeout);
-    state.typingTimeout = setTimeout(() => showTypingIndicator(false), 3000);
-  } else {
-    if (typingEl) { typingEl.remove(); typingEl = null; }
-  }
+// ─── SEND ────────────────────────────────────────────
+function onTaKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+function onTaInput() {
+  const el=$('chat-ta');
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,112)+'px';
+  if (!S.typingOut && S.activeConvo) { S.typingOut=true; wsSend({type:'typing',convo_id:S.activeConvo.id,is_typing:true}); }
+  clearTimeout(S.typingDebounce);
+  S.typingDebounce=setTimeout(()=>{ S.typingOut=false; if(S.activeConvo) wsSend({type:'typing',convo_id:S.activeConvo.id,is_typing:false}); },1500);
 }
 
-// ── Send Message ──────────────────────────────────────
-function handleInputKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+function sendMsg() {
+  const ta=$('chat-ta'), content=ta.value.trim();
+  if (!content || !S.activeConvo) return;
+  const cid=S.activeConvo.id, tmp='tmp_'+Date.now();
+  if (!S.msgs[cid]) S.msgs[cid]=[];
+  S.msgs[cid].push({ id:tmp, temp_id:tmp, convo_id:cid, sender_id:S.user.id,
+    sender_name:S.user.username, content, created_at:Math.floor(Date.now()/1000), _tmp:true });
+  renderMsgs();
+  ta.value=''; ta.style.height='auto';
+  wsSend({ type:'chat', convo_id:cid, content, temp_id:tmp });
 }
 
-function handleInputChange() {
-  const el = $('chat-input');
-  // Auto-resize
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-  // Typing indicator
-  if (!state.isTyping && state.activeConvoId) {
-    state.isTyping = true;
-    wsSend({ type: 'typing', convo_id: state.activeConvoId, is_typing: true });
-  }
-  clearTimeout(state.typingDebounce);
-  state.typingDebounce = setTimeout(() => {
-    state.isTyping = false;
-    if (state.activeConvoId) wsSend({ type: 'typing', convo_id: state.activeConvoId, is_typing: false });
-  }, 1500);
-}
-
-function sendMessage() {
-  const el = $('chat-input');
-  const content = el.value.trim();
-  if (!content || !state.activeConvoId) return;
-
-  const tempId = 'tmp_' + Date.now();
-  const tempMsg = {
-    id: tempId, temp_id: tempId,
-    convo_id: state.activeConvoId,
-    sender_id: state.user.id,
-    sender_name: state.user.username,
-    content,
-    created_at: Math.floor(Date.now() / 1000),
-    _sending: true
-  };
-
-  if (!state.messages[state.activeConvoId]) state.messages[state.activeConvoId] = [];
-  state.messages[state.activeConvoId].push(tempMsg);
-  renderMessages();
-
-  el.value = '';
-  el.style.height = 'auto';
-
-  wsSend({
-    type: 'chat',
-    convo_id: state.activeConvoId,
-    content,
-    temp_id: tempId
-  });
-
-  // The WS echo will replace temp msg; if offline, clean up
-  setTimeout(() => {
-    const msgs = state.messages[state.activeConvoId] || [];
-    const tmp = msgs.find(m => m.id === tempId);
-    if (tmp) tmp._sending = false;
-    if (state.activeConvoId) renderMessages();
-  }, 3000);
-}
-
-// ── New Conversation Modal ─────────────────────────────
-function openNewConvo() { openModal('new-convo-modal'); $('user-search-input').value = ''; $('user-search-results').innerHTML = '<div class="search-no-results">Search for someone to start chatting</div>'; }
-
-function openModal(id) { $(id).classList.add('show'); }
+// ─── MODALS ──────────────────────────────────────────
+function openNewConvoModal() { openModal('modal-new'); $('usr-search').value=''; $('usr-results').innerHTML='<div class="no-res">Type to search for people</div>'; setTimeout(()=>$('usr-search').focus(),200); }
+function openModal(id)  { $(id).classList.add('show'); }
 function closeModal(id) { $(id).classList.remove('show'); }
+function overlayClick(e,id) { if(e.target===$(id)) closeModal(id); }
 
-$('new-convo-modal').addEventListener('click', e => {
-  if (e.target === $('new-convo-modal')) closeModal('new-convo-modal');
-});
-
-let searchDebounce;
+let usrDebounce;
 async function searchUsers(q) {
-  clearTimeout(searchDebounce);
-  if (q.length < 2) {
-    $('user-search-results').innerHTML = '<div class="search-no-results">Type at least 2 characters</div>';
-    return;
-  }
-  searchDebounce = setTimeout(async () => {
+  clearTimeout(usrDebounce);
+  if (q.length<2) { $('usr-results').innerHTML='<div class="no-res">Type at least 2 characters</div>'; return; }
+  usrDebounce=setTimeout(async()=>{
     try {
-      const users = await api(`/api/users/search?q=${encodeURIComponent(q)}`);
-      if (!users.length) {
-        $('user-search-results').innerHTML = '<div class="search-no-results">No users found</div>';
-        return;
-      }
-      $('user-search-results').innerHTML = users.map(u => `
-        <div class="user-result" onclick="startConvoWith('${u.id}','${escHtml(u.username)}','${u.avatar_url||''}')">
+      const users=await api(`/api/users/search?q=${encodeURIComponent(q)}`);
+      if (!users.length) { $('usr-results').innerHTML='<div class="no-res">No users found</div>'; return; }
+      $('usr-results').innerHTML=users.map(u=>`
+        <div class="user-result" onclick="startConvoWith('${u.id}','${esc(u.username)}','${u.avatar_url||''}')">
           <div class="avatar">
-            <div class="avatar-img">${u.avatar_url ? `<img src="${u.avatar_url}">` : getInitials(u.username)}</div>
-            <span class="status-dot ${u.status === 'online' ? 'online' : ''}"></span>
+            <div class="av-img">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:`${initials(u.username)}`}</div>
+            <span class="av-dot${u.status==='online'?' online':''}"></span>
           </div>
-          <div class="user-result-info">
-            <div class="user-result-name">${escHtml(u.username)}</div>
-            <div class="user-result-email">${escHtml(u.email)}</div>
+          <div class="ur-info">
+            <div class="ur-name">${esc(u.username)}</div>
+            <div class="ur-email">${esc(u.email)}</div>
           </div>
-          <div class="user-result-status ${u.status === 'online' ? 'online' : 'offline'}">
-            ${u.status === 'online' ? '● Online' : '○ Offline'}
-          </div>
+          <span class="ur-badge ${u.status==='online'?'on':'off'}">${u.status==='online'?'● Online':'○ Offline'}</span>
         </div>`).join('');
     } catch {}
-  }, 300);
+  },280);
 }
 
-async function startConvoWith(userId, username, avatarUrl) {
-  closeModal('new-convo-modal');
+async function startConvoWith(uid, name, avatar) {
+  closeModal('modal-new');
   try {
-    const { id } = await api('/api/conversations', { method: 'POST', body: { user_id: userId } });
-    await loadConversations();
-    openConvo(id, userId, username, avatarUrl);
-  } catch (e) {
-    showToast(e.message, 'error');
-  }
+    const {id} = await api('/api/conversations',{method:'POST',body:{user_id:uid}});
+    await loadConvos();
+    openConvo(id, uid, name, avatar);
+  } catch(e) { toast(e.message,'err'); }
 }
 
-// ── Mobile sidebar ────────────────────────────────────
-function openSidebar() {
-  $('sidebar').classList.add('open');
-  $('sidebar-backdrop').classList.add('show');
-}
-function closeSidebar() {
-  $('sidebar').classList.remove('open');
-  $('sidebar-backdrop').classList.remove('show');
-}
+// ─── SIDEBAR (mobile) ────────────────────────────────
+function openSidebar()  { $('sidebar').classList.add('open'); $('sb-backdrop').classList.add('show'); }
+function closeSidebar() { $('sidebar').classList.remove('open'); $('sb-backdrop').classList.remove('show'); }
 
 // ══════════════════════════════════════════════════════
-// ── WebRTC / Calls ────────────────────────────────────
-// Uses native RTCPeerConnection (no external library needed)
+// ─── WEBRTC CALLS — fixed implementation ─────────────
 // ══════════════════════════════════════════════════════
+//
+// Key fixes vs previous version:
+// 1. Callee: setRemoteDescription BEFORE createAnswer (correct order)
+// 2. ICE candidates queued until remote desc is set on BOTH sides
+// 3. call_screen uses display:flex (not controlled via CSS .show class conflict)
+// 4. pc.ontrack fires immediately if remote already sent tracks
+// 5. Proper cleanup prevents ghost connections
 
-const ICE_SERVERS = [
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:stun2.l.google.com:19302' }
+const ICE = [
+  {urls:'stun:stun.l.google.com:19302'},
+  {urls:'stun:stun1.l.google.com:19302'},
+  {urls:'stun:stun2.l.google.com:19302'},
+  // Free TURN from Open Relay (limited bandwidth, good for testing)
+  {urls:'turn:openrelay.metered.ca:80',    username:'openrelayproject',credential:'openrelayproject'},
+  {urls:'turn:openrelay.metered.ca:443',   username:'openrelayproject',credential:'openrelayproject'},
+  {urls:'turn:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'},
 ];
 
-async function startCall(type) {
-  if (!state.activePeerId || state.call.active) return;
-  if (state.call.incoming) return; // can't initiate during incoming
+// Initiator (caller) flow:
+//   getUserMedia → createPC → addTracks → createOffer → setLocal → send offer
+// Callee flow:
+//   getUserMedia → createPC → addTracks → setRemote(offer) → createAnswer → setLocal → send answer
+// Both:
+//   on ice_candidate received → addIceCandidate (or queue if no remote desc yet)
 
-  state.call.type = type;
-  state.call.peerId = state.activePeerId;
-  state.call.peerName = state.activePeerName;
-  state.call.convoId = state.activeConvoId;
+async function startCall(type) {
+  if (S.call.active) return;
+  if (!S.activeConvo?.peerId) return;
+
+  S.call.type    = type;
+  S.call.peerId  = S.activeConvo.peerId;
+  S.call.peerName= S.activeConvo.peerName;
+  S.call.convoId = S.activeConvo.id;
+
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(
+      type==='video' ? {audio:true,video:{facingMode:'user'}} : {audio:true,video:false}
+    );
+  } catch(e) {
+    toast('Camera/mic access denied: '+e.message,'err'); return;
+  }
+
+  S.call.localStream = stream;
+  S.call.active = true;
+  showCallScreen('Calling…');
+
+  if (type==='video') {
+    const lv = $('local-video');
+    lv.srcObject = stream;
+    lv.style.display = '';
+  }
+
+  // Create PC and make offer
+  createPC();
+  stream.getTracks().forEach(t => S.call.pc.addTrack(t, stream));
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia(
-      type === 'video' ? { audio: true, video: true } : { audio: true, video: false }
-    );
-    state.call.localStream = stream;
-    $('local-video').srcObject = stream;
-    if (type !== 'video') $('local-video').style.display = 'none';
-
-    showCallOverlay('Calling…');
-    createPeerConnection(true);
-  } catch (e) {
-    showToast('Could not access media: ' + e.message, 'error');
+    const offer = await S.call.pc.createOffer();
+    await S.call.pc.setLocalDescription(offer);
+    wsSend({
+      type: 'call_offer',
+      to_user_id: S.call.peerId,
+      offer: S.call.pc.localDescription,
+      call_type: type,
+      caller_name: S.user.username,
+      convo_id: S.call.convoId,
+    });
+  } catch(e) {
+    toast('Failed to start call','err');
+    cleanupCall();
   }
 }
 
-function createPeerConnection(isInitiator) {
-  const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-  state.call.peer = pc;
-  state.call.active = true;
+function createPC() {
+  const pc = new RTCPeerConnection({iceServers: ICE});
+  S.call.pc = pc;
+  S.call.pendingCandidates = [];
 
-  // Add local tracks
-  if (state.call.localStream) {
-    state.call.localStream.getTracks().forEach(t => pc.addTrack(t, state.call.localStream));
-  }
-
-  pc.onicecandidate = ({ candidate }) => {
-    if (candidate) {
-      wsSend({
-        type: 'ice_candidate',
-        to_user_id: state.call.peerId,
-        candidate
-      });
-    }
+  pc.onicecandidate = ({candidate}) => {
+    if (candidate) wsSend({type:'ice_candidate', to_user_id:S.call.peerId, candidate});
   };
 
-  pc.ontrack = ({ streams }) => {
-    const [stream] = streams;
-    state.call.remoteStream = stream;
-    $('remote-video').srcObject = stream;
-    $('call-status').textContent = 'Connected';
-    $('call-timer').style.display = 'block';
-    state.call.startedAt = Date.now();
-    startCallTimer();
+  pc.ontrack = ({streams}) => {
+    if (!streams?.length) return;
+    $('remote-video').srcObject = streams[0];
+    $('call-stat').textContent = 'Connected';
+    $('call-timer').style.display = '';
+    $('call-av').classList.add('connected');
+    S.call.startedAt = Date.now();
+    startTimer();
   };
 
   pc.oniceconnectionstatechange = () => {
-    if (['failed','disconnected','closed'].includes(pc.iceConnectionState)) {
-      if (state.call.active) endCall(false);
+    const st = pc.iceConnectionState;
+    if (st==='connected'||st==='completed') $('call-stat').textContent='Connected';
+    if (st==='checking') $('call-stat').textContent='Connecting…';
+    if (['failed','disconnected','closed'].includes(st) && S.call.active) {
+      toast('Call connection lost','err'); cleanupCall();
     }
   };
 
-  // Process queued ICE candidates
-  state.call.iceCandidateQueue.forEach(c => pc.addIceCandidate(c));
-  state.call.iceCandidateQueue = [];
+  return pc;
+}
 
-  if (isInitiator) {
-    pc.createOffer()
-      .then(offer => pc.setLocalDescription(offer))
-      .then(() => {
-        wsSend({
-          type: 'call_offer',
-          to_user_id: state.call.peerId,
-          offer: pc.localDescription,
-          call_type: state.call.type,
-          caller_name: state.user.username,
-          convo_id: state.call.convoId
-        });
-      })
-      .catch(e => { showToast('Failed to create offer', 'error'); endCall(false); });
+// ── Helper: add queued ICE candidates after remote desc set ──
+async function drainCandidates() {
+  const pc = S.call.pc;
+  if (!pc || !pc.remoteDescription) return;
+  while (S.call.pendingCandidates.length) {
+    const c = S.call.pendingCandidates.shift();
+    try { await pc.addIceCandidate(c); } catch {}
   }
 }
 
-function handleIncomingOffer(msg) {
-  if (state.call.active) {
-    // Busy — reject immediately
-    wsSend({ type: 'call_reject', to_user_id: msg.from_user_id, reason: 'busy' });
+// ── Incoming offer ───────────────────────────────────
+function onCallOffer(msg) {
+  if (S.call.active) {
+    wsSend({type:'call_reject',to_user_id:msg.from_user_id,reason:'busy'});
     return;
   }
-  state.call.incoming = msg;
-  state.call.peerId = msg.from_user_id;
-  state.call.peerName = msg.caller_name;
-  state.call.convoId = msg.convo_id;
-  state.call.type = msg.call_type;
+  S.call.incoming = msg;
+  S.call.peerId   = msg.from_user_id;
+  S.call.peerName = msg.caller_name;
+  S.call.convoId  = msg.convo_id;
+  S.call.type     = msg.call_type;
 
-  $('incoming-name').textContent = msg.caller_name;
-  $('incoming-type').textContent = msg.call_type === 'video' ? '📹 Video call' : '📞 Voice call';
-  $('incoming-call').classList.add('show');
-
-  // Ring sound (simple beep via AudioContext)
-  ring(true);
+  $('inc-name').textContent = msg.caller_name;
+  $('inc-type').textContent = msg.call_type==='video'?'📹 Video call':'📞 Voice call';
+  $('incoming-banner').classList.add('show');
+  ringStart();
 }
 
 async function acceptCall() {
-  const msg = state.call.incoming;
+  const msg = S.call.incoming;
   if (!msg) return;
-  state.call.incoming = null;
-  $('incoming-call').classList.remove('show');
-  ring(false);
+  S.call.incoming = null;
+  $('incoming-banner').classList.remove('show');
+  ringStop();
+
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(
+      msg.call_type==='video' ? {audio:true,video:{facingMode:'user'}} : {audio:true,video:false}
+    );
+  } catch(e) {
+    toast('Camera/mic access denied','err'); return;
+  }
+
+  S.call.localStream = stream;
+  S.call.active = true;
+  showCallScreen('Connecting…');
+
+  if (msg.call_type==='video') {
+    const lv=$('local-video'); lv.srcObject=stream; lv.style.display='';
+  }
+
+  // Create PC, add tracks
+  createPC();
+  stream.getTracks().forEach(t => S.call.pc.addTrack(t, stream));
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia(
-      msg.call_type === 'video' ? { audio: true, video: true } : { audio: true, video: false }
-    );
-    state.call.localStream = stream;
-    $('local-video').srcObject = stream;
-    if (msg.call_type !== 'video') $('local-video').style.display = 'none';
-
-    showCallOverlay('Connecting…');
-    createPeerConnection(false);
-
-    const pc = state.call.peer;
-    await pc.setRemoteDescription(new RTCSessionDescription(msg.offer));
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
-
+    // CORRECT ORDER: setRemote(offer) → createAnswer → setLocal
+    await S.call.pc.setRemoteDescription(new RTCSessionDescription(msg.offer));
+    await drainCandidates();  // drain any early ICE candidates
+    const answer = await S.call.pc.createAnswer();
+    await S.call.pc.setLocalDescription(answer);
     wsSend({
       type: 'call_answer',
-      to_user_id: state.call.peerId,
-      answer: pc.localDescription
+      to_user_id: S.call.peerId,
+      answer: S.call.pc.localDescription,
     });
-  } catch (e) {
-    showToast('Could not access media', 'error');
-    rejectCall();
+  } catch(e) {
+    toast('Failed to connect call','err');
+    cleanupCall();
   }
 }
 
 function rejectCall() {
-  const msg = state.call.incoming;
-  state.call.incoming = null;
-  $('incoming-call').classList.remove('show');
-  ring(false);
+  const msg = S.call.incoming;
+  S.call.incoming = null;
+  $('incoming-banner').classList.remove('show');
+  ringStop();
   if (msg) {
-    wsSend({ type: 'call_reject', to_user_id: msg.from_user_id });
-    logCall(msg.convo_id, msg.from_user_id, msg.call_type, 'declined', Math.floor(Date.now()/1000), null, 0);
+    wsSend({type:'call_reject',to_user_id:msg.from_user_id});
+    logCall(msg.convo_id, msg.from_user_id, msg.call_type,'declined');
   }
 }
 
-async function handleCallAnswer(msg) {
-  const pc = state.call.peer;
+// ── Answer received (on caller side) ────────────────
+async function onCallAnswer(msg) {
+  const pc = S.call.pc;
   if (!pc) return;
   try {
     await pc.setRemoteDescription(new RTCSessionDescription(msg.answer));
-  } catch {}
+    await drainCandidates();  // drain ICE candidates that arrived before answer
+  } catch(e) { console.error('setRemoteDescription(answer) failed',e); }
 }
 
-function handleCallRejected(msg) {
-  showToast(`${state.call.peerName} declined the call`);
-  endCall(false);
+function onCallReject(msg) {
+  toast(`${S.call.peerName||'User'} declined the call`);
+  cleanupCall();
 }
 
-function handleCallEnded(msg) {
-  if (state.call.active || state.call.incoming) {
-    endCall(false);
-  }
-}
+function onCallEnd(msg) { if (S.call.active) cleanupCall(); }
 
-async function handleIceCandidate(msg) {
-  const pc = state.call.peer;
-  if (pc && pc.remoteDescription) {
-    try { await pc.addIceCandidate(new RTCIceCandidate(msg.candidate)); } catch {}
+async function onIceCandidate(msg) {
+  const pc = S.call.pc;
+  if (!pc) return;
+  const cand = new RTCIceCandidate(msg.candidate);
+  if (pc.remoteDescription && pc.remoteDescription.type) {
+    try { await pc.addIceCandidate(cand); } catch {}
   } else {
-    state.call.iceCandidateQueue.push(new RTCIceCandidate(msg.candidate));
+    // Queue until remote desc is set
+    S.call.pendingCandidates.push(cand);
   }
 }
 
-function endCall(notify = true) {
-  clearInterval(state.call.timerInterval);
-  ring(false);
+function endCall(notify=true) {
+  if (notify && S.call.peerId) wsSend({type:'call_end',to_user_id:S.call.peerId});
+  const dur = S.call.startedAt ? Math.floor((Date.now()-S.call.startedAt)/1000) : 0;
+  const status = S.call.startedAt ? 'answered' : 'missed';
+  if (S.call.convoId && S.call.peerId)
+    logCall(S.call.convoId, S.call.peerId, S.call.type, status, dur);
+  cleanupCall();
+}
 
-  const duration = state.call.startedAt
-    ? Math.floor((Date.now() - state.call.startedAt) / 1000)
-    : 0;
-  const status = state.call.startedAt ? 'answered' : 'missed';
-
-  if (notify && state.call.peerId) {
-    wsSend({ type: 'call_end', to_user_id: state.call.peerId });
-  }
-
-  // Log call
-  if (state.call.convoId && state.call.peerId) {
-    logCall(
-      state.call.convoId, state.call.peerId, state.call.type, status,
-      Math.floor((Date.now() - (duration * 1000)) / 1000),
-      duration ? Math.floor(Date.now() / 1000) : null, duration
-    );
-  }
-
-  // Cleanup
-  if (state.call.localStream) {
-    state.call.localStream.getTracks().forEach(t => t.stop());
-  }
-  if (state.call.peer) {
-    state.call.peer.close();
-  }
-
-  Object.assign(state.call, {
-    active: false, incoming: null, peer: null,
-    localStream: null, remoteStream: null,
-    type: null, peerId: null, peerName: null,
-    convoId: null, startedAt: null,
-    muted: false, camOff: false, iceCandidateQueue: []
+function cleanupCall() {
+  clearInterval(S.call.timerIv);
+  ringStop();
+  if (S.call.localStream) S.call.localStream.getTracks().forEach(t=>t.stop());
+  if (S.call.pc) { try { S.call.pc.close(); } catch {} }
+  Object.assign(S.call, {
+    active:false, incoming:null, pc:null,
+    localStream:null, type:null,
+    peerId:null, peerName:null, convoId:null,
+    startedAt:null, muted:false, camOff:false, pendingCandidates:[],
   });
-
-  $('call-overlay').classList.remove('show');
-  $('remote-video').srcObject = null;
-  $('local-video').srcObject = null;
-  $('local-video').style.display = 'block';
+  $('call-screen').style.display='none';
+  $('remote-video').srcObject=null;
+  const lv=$('local-video'); lv.srcObject=null; lv.style.display='none';
+  $('incoming-banner').classList.remove('show');
 }
 
-function showCallOverlay(status) {
-  $('call-peer-name').textContent = state.call.peerName;
-  $('call-status').textContent = status;
-  $('call-timer').style.display = 'none';
-  $('call-overlay').classList.add('show');
-  $('btn-mute').textContent = '🎤';
-  $('btn-cam').textContent = state.call.type === 'video' ? '📷' : '–';
-  $('btn-cam').disabled = state.call.type !== 'video';
-  if (state.call.type !== 'video') $('btn-cam').style.opacity = '.3';
-  else $('btn-cam').style.opacity = '1';
+function showCallScreen(status) {
+  const c=S.call;
+  $('call-av').textContent=initials(c.peerName);
+  $('call-av').classList.remove('connected');
+  $('call-peer-nm').textContent=c.peerName||'';
+  $('call-stat').textContent=status;
+  $('call-timer').style.display='none';
+  $('call-timer').textContent='';
+  $('call-type-badge').textContent = c.type==='video'?'Video Call':'Voice Call';
+  $('btn-mute').textContent='🎤';
+  $('btn-cam').textContent='📷';
+  $('btn-cam').disabled = c.type!=='video';
+  $('btn-cam').style.opacity = c.type!=='video'?'.3':'1';
+  $('call-screen').style.display='flex';
+  $('remote-video').srcObject=null;
 }
 
-function startCallTimer() {
-  state.call.timerInterval = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - state.call.startedAt) / 1000);
-    $('call-timer').textContent = formatDuration(elapsed);
-  }, 1000);
+function startTimer() {
+  S.call.timerIv=setInterval(()=>{
+    if (!S.call.startedAt) return;
+    $('call-timer').textContent=durFormat(Math.floor((Date.now()-S.call.startedAt)/1000));
+  },1000);
 }
 
 function toggleMute() {
-  const stream = state.call.localStream;
-  if (!stream) return;
-  stream.getAudioTracks().forEach(t => t.enabled = state.call.muted);
-  state.call.muted = !state.call.muted;
-  $('btn-mute').textContent = state.call.muted ? '🔇' : '🎤';
-  $('btn-mute').classList.toggle('muted', state.call.muted);
+  const s=S.call.localStream; if (!s) return;
+  S.call.muted=!S.call.muted;
+  s.getAudioTracks().forEach(t=>t.enabled=!S.call.muted);
+  $('btn-mute').textContent=S.call.muted?'🔇':'🎤';
+  $('btn-mute').className=S.call.muted?'active-r':'';
 }
 
-function toggleCamera() {
-  const stream = state.call.localStream;
-  if (!stream || state.call.type !== 'video') return;
-  stream.getVideoTracks().forEach(t => t.enabled = state.call.camOff);
-  state.call.camOff = !state.call.camOff;
-  $('btn-cam').textContent = state.call.camOff ? '🚫' : '📷';
+function toggleCam() {
+  const s=S.call.localStream; if (!s||S.call.type!=='video') return;
+  S.call.camOff=!S.call.camOff;
+  s.getVideoTracks().forEach(t=>t.enabled=!S.call.camOff);
+  $('btn-cam').textContent=S.call.camOff?'🚫':'📷';
+  $('btn-cam').className=S.call.camOff?'active-r':'';
 }
 
 function toggleSpeaker() {
-  const vid = $('remote-video');
-  vid.muted = !vid.muted;
-  $('btn-speaker').textContent = vid.muted ? '🔈' : '🔊';
+  const v=$('remote-video'); v.muted=!v.muted;
+  $('btn-spk').textContent=v.muted?'🔈':'🔊';
+  $('btn-spk').className=v.muted?'active-r':'';
 }
 
-async function logCall(convoId, peerId, type, status, startedAt, endedAt, duration) {
+async function logCall(convoId,peerId,type,status,duration=0) {
   try {
-    await api('/api/calls', { method: 'POST', body: { convo_id: convoId, callee_id: peerId, type, status, started_at: startedAt, ended_at: endedAt, duration } });
+    const now=Math.floor(Date.now()/1000);
+    await api('/api/calls',{method:'POST',body:{
+      convo_id:convoId, callee_id:peerId, type, status,
+      started_at: now-(duration||0), ended_at:now, duration
+    }});
   } catch {}
 }
 
-// Simple ring using AudioContext
-let ringOscillator = null, ringCtx = null;
-function ring(on) {
-  if (on) {
-    try {
-      ringCtx = new AudioContext();
-      const osc = ringCtx.createOscillator();
-      const gain = ringCtx.createGain();
-      osc.connect(gain); gain.connect(ringCtx.destination);
-      osc.type = 'sine'; osc.frequency.value = 440;
-      gain.gain.value = 0.1;
-      osc.start();
-      ringOscillator = osc;
-    } catch {}
-  } else {
-    try { ringOscillator?.stop(); ringCtx?.close(); } catch {}
-    ringOscillator = null; ringCtx = null;
-  }
+// ─── Ring ────────────────────────────────────────────
+let _ringCtx=null, _ringNodes=[];
+function ringStart() {
+  try {
+    _ringCtx=new AudioContext();
+    function beep() {
+      if (!_ringCtx) return;
+      const o=_ringCtx.createOscillator(), g=_ringCtx.createGain();
+      o.connect(g); g.connect(_ringCtx.destination);
+      o.frequency.value=880; g.gain.value=0.08;
+      o.start(); o.stop(_ringCtx.currentTime+0.2);
+      _ringNodes.push(o);
+    }
+    beep(); const iv=setInterval(beep,1000);
+    _ringNodes.push({stop:()=>clearInterval(iv)});
+  } catch {}
+}
+function ringStop() {
+  _ringNodes.forEach(n=>{ try{ n.stop?.(); }catch{} }); _ringNodes=[];
+  try { _ringCtx?.close(); } catch {}
+  _ringCtx=null;
 }
 
-// ── Boot ──────────────────────────────────────────────
-if (state.token && state.user) {
-  initApp();
-}
+// ─── BOOT ────────────────────────────────────────────
+if (S.token && S.user) initApp();
 
-// Handle Enter in auth inputs
-$('login-email').addEventListener('keydown', e => e.key === 'Enter' && $('login-password').focus());
-$('login-password').addEventListener('keydown', e => e.key === 'Enter' && doLogin());
-$('reg-username').addEventListener('keydown', e => e.key === 'Enter' && $('reg-email').focus());
-$('reg-email').addEventListener('keydown', e => e.key === 'Enter' && $('reg-password').focus());
-$('reg-password').addEventListener('keydown', e => e.key === 'Enter' && doRegister());
+// Auth enter-key
+$('li-email').onkeydown = e=>e.key==='Enter'&&$('li-pass').focus();
+$('li-pass').onkeydown  = e=>e.key==='Enter'&&doLogin();
+$('rg-user').onkeydown  = e=>e.key==='Enter'&&$('rg-email').focus();
+$('rg-email').onkeydown = e=>e.key==='Enter'&&$('rg-pass').focus();
+$('rg-pass').onkeydown  = e=>e.key==='Enter'&&doRegister();
 </script>
 </body>
 </html>
